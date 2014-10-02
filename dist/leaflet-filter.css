@@ -1,0 +1,7 @@
+/*! leaflet-filter Version: 0.1.0 */
+/* ================================================================== */
+/* Font-awesome toolbar
+/* ================================================================== */
+.leaflet-draw-toolbar.leaflet-fa-toolbar a {
+	background-image: none;
+}
