@@ -15,16 +15,16 @@ gulp.task('build', ['js', 'css'] );
 
 gulp.task('js', function(){
 	return gulp.src([
-		'src/js/FontAwesomeToolbar.js',
-		'src/js/filter/Leaflet.filter.js',
-		'src/js/filter/handler/Filter.Feature.js',
-		'src/js/filter/handler/Filter.SimpleShape.js',
-		'src/js/filter/handler/Filter.Rectangle.js',
-		'src/js/filter/handler/Filter.Clear.js',
-		'src/js/filter/Control.Filter.js',
-		'src/js/filter/FilterToolbar.js',
-		'src/js/**/*.js'
-	])
+			'src/js/FontAwesomeToolbar.js',
+			'src/js/filter/Leaflet.filter.js',
+			'src/js/filter/handler/Filter.Feature.js',
+			'src/js/filter/handler/Filter.SimpleShape.js',
+			'src/js/filter/handler/Filter.Rectangle.js',
+			'src/js/filter/handler/Filter.Clear.js',
+			'src/js/filter/Control.Filter.js',
+			'src/js/filter/FilterToolbar.js',
+			'src/js/**/*.js'
+		])
 
 		// JS Hint
 		.pipe(plugins.jshint('.jshintrc'))
