@@ -9,8 +9,28 @@ You can only draw one bounding box at a time and you can clear the filter by cli
 ## How do I use it?
 
 ```js
+// First create a layer onto which the filter geometry will be drawn and add it to the map
+var drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+// Create the filter control with its configuration and add to the map
+var control = new L.Control.Filter({
+	position: 'topright',
+	filter: {
+		rectangle: {}
+	},
+	filterGroup: drawnItems
+});
+map.addControl(control);
+
+// Register for the filter event and do something!
+map.on('filter:filter', function (e) {
+	console.log(e);
+});
 
 ```
+
+If you would like to use this plugin with the [Angular Leaflet Directive](https://github.com/tombatossals/angular-leaflet-directive), use the [Angular Directive Extension project](https://github.com/Asymmetrik/angular-leaflet-directive-ext)
 
 ## How do I include this plugin in my project?
 The easiest way to include this plugin in your project, use [Bower](http://bower.io)
