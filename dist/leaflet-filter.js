@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.1.0 */
+/*! leaflet-filter Version: 0.2.1 */
 (function(){
 	"use strict";
 
@@ -496,6 +496,7 @@
 			L.Filter.SimpleShape.prototype.initialize.call(this, map, options);
 		},
 
+		// Get the geo representation of the current filter box
 		getGeo: function(layer){
 			return {
 				type: 'rectangle',
@@ -510,6 +511,7 @@
 			};
 		},
 
+		// Programmatic way to draw a filter rectangle (bit of a hack)
 		setFilter: function(filter) {
 			this.enable();
 
