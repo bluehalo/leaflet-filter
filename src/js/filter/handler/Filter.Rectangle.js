@@ -30,6 +30,7 @@
 			L.Filter.SimpleShape.prototype.initialize.call(this, map, options);
 		},
 
+		// Get the geo representation of the current filter box
 		getGeo: function(layer){
 			return {
 				type: 'rectangle',
@@ -42,6 +43,22 @@
 					lng: layer.getBounds()._southWest.lng,
 				}
 			};
+		},
+
+		// Programmatic way to draw a filter rectangle (bit of a hack)
+		setFilter: function(filter) {
+			this.enable();
+
+			// init
+			this._isDrawing = true;
+			this._startLatLng = filter.northEast;
+
+			// Update
+			this._drawShape(filter.southWest);
+
+			// Finish
+			this._fireCreatedEvent();
+			this.disable();
 		},
 
 		_drawShape: function (latlng) {

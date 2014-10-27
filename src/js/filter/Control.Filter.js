@@ -5,7 +5,9 @@
 
 		options: {
 			position: 'topleft',
-			filter: {}
+			filter: {
+				rectangle: {}
+			}
 		},
 
 		initialize: function (options) {
@@ -54,6 +56,15 @@
 			}
 
 			this._toolbar.removeToolbar();
+		},
+
+		setFilter: function(filter){
+			this._filterCleared();
+			this._toolbar.setFilter(filter);
+		},
+
+		clearFilter: function(){
+			this._filterCleared();
 		},
 
 		_filterCreated: function(e){

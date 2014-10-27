@@ -16,6 +16,8 @@
 </head>
 <body>
 	<div id="map" style="width: 800px; height: 600px; border: 1px solid #ccc"></div>
+	<button onclick="createFn()">Create</button>
+	<button onclick="clearFn()">Clear</button>
 
 	<script>
 
@@ -40,6 +42,23 @@
 			console.log(e);
 		});
 
+		function createFn(){
+			control.setFilter({
+				type: 'rectangle',
+				northEast: {
+					lat: 51.51739577570338 + (Math.random()*0.0125 - 0.00625),
+					lng: -0.02506256103515625 + (Math.random()*0.0125 - 0.00625)
+				},
+				southWest: {
+					lat: 51.49944632447973 + (Math.random()*0.0125 - 0.00625),
+					lng: -0.05424499511718749 + (Math.random()*0.0125 - 0.00625)
+				}
+			});
+		}
+
+		function clearFn(){
+			control.clearFilter();
+		}
 	</script>
 </body>
 </html>

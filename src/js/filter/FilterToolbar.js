@@ -75,7 +75,7 @@
 			var type;
 
 			if(filtered){
-				for(type in this._modes){
+				for(type in this._modes) {
 					// The two draw buttons are disabled when we are filtered
 					L.DomUtil.addClass(this._modes[type].button, 'leaflet-disabled');
 					this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons.disabled);
@@ -102,7 +102,15 @@
 			}
 		},
 
-		getGeo: function(layerType, layer){
+		setFilter: function(filter) {
+			if(null != this._modes[filter.type]) {
+				this._modes[filter.type].handler.setFilter(filter);
+			} else {
+				console.error('Unsupported filter type: ' + filter.type);
+			}
+		},
+
+		getGeo: function(layerType, layer) {
 			return this._modes[layerType].handler.getGeo(layer);
 		}
 

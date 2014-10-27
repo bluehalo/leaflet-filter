@@ -510,6 +510,21 @@
 			};
 		},
 
+		setFilter: function(filter) {
+			this.enable();
+
+			// init
+			this._isDrawing = true;
+			this._startLatLng = filter.northEast;
+
+			// Update
+			this._drawShape(filter.southWest);
+
+			// Finish
+			this._fireCreatedEvent();
+			this.disable();
+		},
+
 		_drawShape: function (latlng) {
 			if (!this._shape) {
 				this._shape = new L.Rectangle(new L.LatLngBounds(this._startLatLng, latlng), this.options.shapeOptions);
@@ -593,7 +608,9 @@
 
 		options: {
 			position: 'topleft',
-			filter: {}
+			filter: {
+				rectangle: {}
+			}
 		},
 
 		initialize: function (options) {
@@ -642,6 +659,15 @@
 			}
 
 			this._toolbar.removeToolbar();
+		},
+
+		setFilter: function(filter){
+			this._filterCleared();
+			this._toolbar.setFilter(filter);
+		},
+
+		clearFilter: function(){
+			this._filterCleared();
 		},
 
 		_filterCreated: function(e){
@@ -782,7 +808,7 @@
 			var type;
 
 			if(filtered){
-				for(type in this._modes){
+				for(type in this._modes) {
 					// The two draw buttons are disabled when we are filtered
 					L.DomUtil.addClass(this._modes[type].button, 'leaflet-disabled');
 					this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons.disabled);
@@ -809,7 +835,15 @@
 			}
 		},
 
-		getGeo: function(layerType, layer){
+		setFilter: function(filter) {
+			if(null != this._modes[filter.type]) {
+				this._modes[filter.type].handler.setFilter(filter);
+			} else {
+				console.error('Unsupported filter type: ' + filter.type);
+			}
+		},
+
+		getGeo: function(layerType, layer) {
 			return this._modes[layerType].handler.getGeo(layer);
 		}
 
