@@ -5,6 +5,7 @@
 
 	"globals": {
 		"L": true,
+		"console": true,
 		"document": true
 	}
 }
