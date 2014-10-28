@@ -54,11 +54,13 @@
 			this._startLatLng = filter.northEast;
 
 			// Update
-			this._drawShape(filter.southWest);
+			var shape = this._drawShape(filter.southWest);
 
 			// Finish
-			this._fireCreatedEvent();
+			//this._fireCreatedEvent();
 			this.disable();
+
+			return shape;
 		},
 
 		_drawShape: function (latlng) {
@@ -68,6 +70,8 @@
 			} else {
 				this._shape.setBounds(new L.LatLngBounds(this._startLatLng, latlng));
 			}
+
+			return { type: 'rectangle', layer: this._shape };
 		},
 
 		_fireCreatedEvent: function () {

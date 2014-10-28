@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.2.1 */
+/*! leaflet-filter Version: 0.2.2 */
 (function(){
 	"use strict";
 
@@ -520,11 +520,13 @@
 			this._startLatLng = filter.northEast;
 
 			// Update
-			this._drawShape(filter.southWest);
+			var shape = this._drawShape(filter.southWest);
 
 			// Finish
-			this._fireCreatedEvent();
+			//this._fireCreatedEvent();
 			this.disable();
+
+			return shape;
 		},
 
 		_drawShape: function (latlng) {
@@ -534,6 +536,8 @@
 			} else {
 				this._shape.setBounds(new L.LatLngBounds(this._startLatLng, latlng));
 			}
+
+			return { type: 'rectangle', layer: this._shape };
 		},
 
 		_fireCreatedEvent: function () {
@@ -644,52 +648,74 @@
 			}
 
 			// register for create events
-			map.on('filter:created', this._filterCreated, this);
-			map.on('filter:cleared', this._filterCleared, this);
+			map.on('filter:created', this._filterCreatedHandler, this);
+			map.on('filter:cleared', this._filterClearedHandler, this);
 
 			return container;
 		},
 
 		onRemove: function (map) {
 			// unregister create events
-			map.off('filter:created', this._filterCreated, this);
-			map.off('filter:cleared', this._filterCleared, this);
+			map.off('filter:created', this._filterCreatedHandler, this);
+			map.off('filter:cleared', this._filterClearedHandler, this);
 
 			if (null != this._filterGroup) {
 				// Unregister for the edit events
-				this._filterGroup.shape.off('edit', this._filterUpdated, this);
+				this._filterGroup.shape.off('edit', this._filterUpdatedHandler, this);
 			}
 
 			this._toolbar.removeToolbar();
 		},
 
+		// Public method to programatically set the state of the filter
 		setFilter: function(filter){
-			this._filterCleared();
-			this._toolbar.setFilter(filter);
+			if(null != filter) {
+				// Ask the handler for the filter object
+				var filterObject = this._toolbar.setFilter(filter);
+
+				// Clear the old filter
+				this._clearFilter(true);
+
+				// Create the new filter
+				this._createFilter(filterObject);
+			} else {
+				this._clearFilter();
+			}
 		},
 
-		clearFilter: function(){
-			this._filterCleared();
-		},
-
-		_filterCreated: function(e){
+		_createFilter: function(filter, suppressEvent) {
 			//Add the created shape to the filter group
-			this.options.filterGroup.addLayer(e.layer);
+			this.options.filterGroup.addLayer(filter.layer);
 
 			// Store the internal representation of the filter state
-			this._filterGroup = { shape: e.layer, type: e.layerType };
+			this._filterGroup = { shape: filter.layer, type: filter.type };
 
 			// Register for the edit events on the filter shape
-			this._filterGroup.shape.on('edit', this._filterUpdated, this);
+			this._filterGroup.shape.on('edit', this._filterUpdatedHandler, this);
 
 			// Fire the event that we've updated the filter
-			this._map.fire('filter:filter', { geo : this._getGeo(e.layerType, e.layer) });
+			if(!suppressEvent) { this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) }); }
 
 			// Set the filtered state on the toolbar
 			this._toolbar.setFiltered(true);
 		},
 
-		_filterUpdated: function(){
+		_clearFilter: function(suppressEvent) {
+			// Remove the filter shape
+			this.options.filterGroup.clearLayers();
+
+			// Fire the event
+			if(!suppressEvent) { this._map.fire('filter:filter', { geo: undefined }); }
+
+			// Update the toolbar state
+			this._toolbar.setFiltered(false);
+		},
+
+		_filterCreatedHandler: function(e){
+			this._createFilter({ type: e.layerType, layer: e.layer});
+		},
+
+		_filterUpdatedHandler: function(){
 			// Only process updates when we have a stored filter shape
 			if(null != this._filterGroup){
 				var payload = {
@@ -700,15 +726,8 @@
 			}
 		},
 
-		_filterCleared: function(){
-			// Remove the filter shape
-			this.options.filterGroup.clearLayers();
-
-			// Fire the event
-			this._map.fire('filter:filter', { geo: undefined });
-
-			// Update the toolbar state
-			this._toolbar.setFiltered(false);
+		_filterClearedHandler: function(){
+			this._clearFilter();
 		},
 
 		_getGeo: function(layerType, layer){
@@ -839,7 +858,7 @@
 
 		setFilter: function(filter) {
 			if(null != this._modes[filter.type]) {
-				this._modes[filter.type].handler.setFilter(filter);
+				return this._modes[filter.type].handler.setFilter(filter);
 			} else {
 				console.error('Unsupported filter type: ' + filter.type);
 			}

@@ -104,7 +104,7 @@
 
 		setFilter: function(filter) {
 			if(null != this._modes[filter.type]) {
-				this._modes[filter.type].handler.setFilter(filter);
+				return this._modes[filter.type].handler.setFilter(filter);
 			} else {
 				console.error('Unsupported filter type: ' + filter.type);
 			}

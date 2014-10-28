@@ -15,7 +15,7 @@
 
 </head>
 <body>
-	<div id="map" style="width: 800px; height: 600px; border: 1px solid #ccc"></div>
+	<div id="map" style="width: 600px; height: 400px; border: 1px solid #ccc"></div>
 	<button onclick="createFn()">Create</button>
 	<button onclick="clearFn()">Clear</button>
 
@@ -57,7 +57,7 @@
 		}
 
 		function clearFn(){
-			control.clearFilter();
+			control.setFilter(null);
 		}
 	</script>
 </body>
