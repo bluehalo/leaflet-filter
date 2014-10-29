@@ -115,6 +115,13 @@
 		},
 
 		equals: function(shape1, shape2) {
+			if(shape1 == null || shape1.type == null) {
+				shape1 = null;
+			}
+			if(shape2 == null || shape2.type == null) {
+				shape2 = null;
+			}
+
 			if(shape1 == null && shape2 == null) {
 				return true;
 			} else if(shape1 == null || shape2 == null) {
