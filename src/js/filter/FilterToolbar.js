@@ -112,6 +112,16 @@
 
 		getGeo: function(layerType, layer) {
 			return this._modes[layerType].handler.getGeo(layer);
+		},
+
+		equals: function(shape1, shape2) {
+			if(shape1 == null && shape2 == null) {
+				return true;
+			} else if(shape1 == null || shape2 == null) {
+				return false;
+			}
+
+			return this._modes[shape1.type].handler.equals(shape1, shape2);
 		}
 
 	});

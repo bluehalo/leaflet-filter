@@ -58,6 +58,10 @@
 			this._toolbar.removeToolbar();
 		},
 
+		equals: function(shape1, shape2){
+			return this._toolbar.equals(shape1, shape2);
+		},
+
 		// Public method to programatically set the state of the filter
 		setFilter: function(filter){
 			if(null != filter) {

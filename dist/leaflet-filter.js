@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.2.2 */
+/*! leaflet-filter Version: 0.2.3 */
 (function(){
 	"use strict";
 
@@ -529,6 +529,17 @@
 			return shape;
 		},
 
+		equals: function(shape1, shape2) {
+			if(shape1.type != shape2.type) {
+				return false;
+			}
+
+			return (shape1.northEast.lat === shape2.northEast.lat && 
+					shape1.northEast.lng === shape2.northEast.lng && 
+					shape1.southWest.lat === shape2.southWest.lat && 
+					shape1.southWest.lng === shape2.southWest.lng);
+		},
+
 		_drawShape: function (latlng) {
 			if (!this._shape) {
 				this._shape = new L.Rectangle(new L.LatLngBounds(this._startLatLng, latlng), this.options.shapeOptions);
@@ -665,6 +676,10 @@
 			}
 
 			this._toolbar.removeToolbar();
+		},
+
+		equals: function(shape1, shape2){
+			return this._toolbar.equals(shape1, shape2);
 		},
 
 		// Public method to programatically set the state of the filter
@@ -866,6 +881,16 @@
 
 		getGeo: function(layerType, layer) {
 			return this._modes[layerType].handler.getGeo(layer);
+		},
+
+		equals: function(shape1, shape2) {
+			if(shape1 == null && shape2 == null) {
+				return true;
+			} else if(shape1 == null || shape2 == null) {
+				return false;
+			}
+
+			return this._modes[shape1.type].handler.equals(shape1, shape2);
 		}
 
 	});
