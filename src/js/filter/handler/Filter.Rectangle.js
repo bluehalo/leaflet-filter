@@ -57,7 +57,6 @@
 			var shape = this._drawShape(filter.southWest);
 
 			// Finish
-			//this._fireCreatedEvent();
 			this.disable();
 
 			return shape;

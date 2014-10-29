@@ -523,7 +523,6 @@
 			var shape = this._drawShape(filter.southWest);
 
 			// Finish
-			//this._fireCreatedEvent();
 			this.disable();
 
 			return shape;
@@ -684,6 +683,13 @@
 
 		// Public method to programatically set the state of the filter
 		setFilter: function(filter){
+			// Check to see if a change is being applied
+			var shape1 = (null != this._filterGroup)? this._getGeo(this._filterGroup.type, this._filterGroup.shape) : undefined;
+			// If there is no change, then we're just going to short circuit out of here
+			if(this._toolbar.equals(shape1, filter)) {
+				return;
+			}
+
 			if(null != filter) {
 				// Ask the handler for the filter object
 				var filterObject = this._toolbar.setFilter(filter);
@@ -718,6 +724,7 @@
 		_clearFilter: function(suppressEvent) {
 			// Remove the filter shape
 			this.options.filterGroup.clearLayers();
+			this._filterGroup = undefined;
 
 			// Fire the event
 			if(!suppressEvent) { this._map.fire('filter:filter', { geo: undefined }); }

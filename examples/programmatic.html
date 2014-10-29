@@ -16,7 +16,8 @@
 </head>
 <body>
 	<div id="map" style="width: 600px; height: 400px; border: 1px solid #ccc"></div>
-	<button onclick="createFn()">Create</button>
+	<button onclick="createFn()">Create Random</button>
+	<button onclick="resetFn()">Reset</button>
 	<button onclick="clearFn()">Clear</button>
 
 	<script>
@@ -52,6 +53,20 @@
 				southWest: {
 					lat: 51.49944632447973 + (Math.random()*0.0125 - 0.00625),
 					lng: -0.05424499511718749 + (Math.random()*0.0125 - 0.00625)
+				}
+			});
+		}
+
+		function resetFn(){
+			control.setFilter({
+				type: 'rectangle',
+				northEast: {
+					lat: 51.51739577570338,
+					lng: -0.02506256103515625
+				},
+				southWest: {
+					lat: 51.49944632447973,
+					lng: -0.05424499511718749
 				}
 			});
 		}
