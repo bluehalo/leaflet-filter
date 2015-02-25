@@ -5,18 +5,19 @@
 
 	<link rel="stylesheet" href="../src/lib/fontawesome/css/font-awesome.css" />
 	<link rel="stylesheet" href="../src/lib/leaflet/dist/leaflet.css" />
-	<link rel="stylesheet" href="../src/lib/Leaflet.draw/dist/leaflet.draw.css" />
+	<link rel="stylesheet" href="../src/lib/leaflet.draw/dist/leaflet.draw.css" />
 	<link rel="stylesheet" href="../dist/leaflet-filter.css" />
 
 	<script src="../src/lib/leaflet/dist/leaflet-src.js"></script>
-	<script src="../src/lib/Leaflet.draw/dist/Leaflet.draw-src.js"></script>
+	<script src="../src/lib/leaflet.draw/dist/leaflet.draw-src.js"></script>
 
 	<script src="../dist/leaflet-filter.js"></script>
 
 </head>
 <body>
 	<div id="map" style="width: 600px; height: 400px; border: 1px solid #ccc"></div>
-	<button onclick="createFn()">Create Random</button>
+	<button onclick="createRectangleFn()">Create Random Rectangle</button>
+	<button onclick="createPolygonFn()">Create Random Polygon</button>
 	<button onclick="resetFn()">Reset</button>
 	<button onclick="clearFn()">Clear</button>
 
@@ -43,7 +44,7 @@
 			console.log(e);
 		});
 
-		function createFn(){
+		function createRectangleFn(){
 			control.setFilter({
 				type: 'rectangle',
 				northEast: {
@@ -54,6 +55,17 @@
 					lat: 51.49944632447973 + (Math.random()*0.0125 - 0.00625),
 					lng: -0.05424499511718749 + (Math.random()*0.0125 - 0.00625)
 				}
+			});
+		}
+		
+		function createPolygonFn(){
+			control.setFilter({
+				type: 'polygon',
+				latlngs: [
+					[ 51.51739577570338, -0.05424499511718749 ],
+					[ 51.51739577570338, -0.02506256103515625 ],
+					[ 51.49944632447973, -0.02506256103515625 ]
+				]
 			});
 		}
 

@@ -2,7 +2,8 @@
   "name": "leaflet-filter",
   "version": "0.2.4",
   "authors": [
-    "reblace <reblace@gmail.com>"
+    "reblace <reblace@gmail.com>",
+    "brianghig <brianghig@gmail.com>"
   ],
   "main": "leaflet-filter.js",
   "scripts": [
