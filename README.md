@@ -3,8 +3,8 @@
 [![Build Status][travis-image]][travis-url]
 
 ## What is it?
-This is a Leaflet plugin that leverages the Leaflet.draw plugin to allow you to draw a single rectangle bounding box filter on a map.
-You can only draw one bounding box at a time and you can clear the filter by clicking on the trash can icon. Additionally, you can subscribe to an event that is fired each time the filter is created/modified/destroyed.
+This is a Leaflet plugin that leverages the Leaflet.draw plugin to allow you to draw a single rectangle bounding box or a multi-point polygon filter on a map.
+You can only draw one filter at a time and you can clear the filter by clicking on the trash can icon. Additionally, you can subscribe to an event that is fired each time the filter is created/modified/destroyed.
 
 ## How do I use it?
 
@@ -17,7 +17,8 @@ map.addLayer(drawnItems);
 var control = new L.Control.Filter({
 	position: 'topright',
 	filter: {
-		rectangle: {}
+		rectangle: {},
+		polygon: {}
 	},
 	filterGroup: drawnItems
 });
