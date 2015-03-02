@@ -56,6 +56,7 @@ gulp.task('css', function(){
 
 		// Concatenate
 		.pipe(plugins.concat(p.name + '.css'))
+		.pipe(plugins.insert.prepend('@import url("icons/filter.css");'))
 		.pipe(plugins.insert.prepend(banner))
 		.pipe(gulp.dest('dist'))
 		.pipe(plugins.filesize())

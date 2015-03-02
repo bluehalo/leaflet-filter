@@ -29,7 +29,7 @@
 					enabled: this.options.rectangle,
 					handler: new L.Filter.Rectangle(map, this.options.rectangle),
 					title: L.filterLocal.filter.toolbar.buttons.rectangle,
-					icon: 'fa fa-square-o'
+					icon: 'fa icon-square'
 				});
 			}
 			if(null != L.Filter.Polygon){
@@ -37,7 +37,7 @@
 					enabled: this.options.polygon,
 					handler: new L.Filter.Polygon(map, this.options.polygon),
 					title: L.filterLocal.filter.toolbar.buttons.polygon,
-					icon: 'fa fa-play'
+					icon: 'fa icon-hex'
 				});
 			}
 			if(null != L.Filter.Clear){
