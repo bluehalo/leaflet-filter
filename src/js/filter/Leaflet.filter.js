@@ -10,6 +10,8 @@
 				},
 				buttons: {
 					rectangle: 'Draw a bounding box filter',
+					polygon: 'Draw a bounding polygon filter',
+					polyline: 'Draw a multipoint line',
 					disabled: 'Filter already applied',
 					clear: 'Clear current filter',
 					clearDisabled: 'No active filter'
@@ -24,6 +26,16 @@
 				rectangle: {
 					tooltip: {
 						start: 'Click and drag to draw rectangle.'
+					}
+				},
+				polyline: {
+					tooltip: {
+						start: 'Click to draw multiple points.'
+					}
+				},
+				polygon: {
+					tooltip: {
+						start: 'Click to draw polygon points.'
 					}
 				}
 			}

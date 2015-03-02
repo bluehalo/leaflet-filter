@@ -20,6 +20,8 @@ gulp.task('js', function(){
 			'src/js/filter/handler/Filter.Feature.js',
 			'src/js/filter/handler/Filter.SimpleShape.js',
 			'src/js/filter/handler/Filter.Rectangle.js',
+			'src/js/filter/handler/Filter.Polyline.js',
+			'src/js/filter/handler/Filter.Polygon.js',
 			'src/js/filter/handler/Filter.Clear.js',
 			'src/js/filter/Control.Filter.js',
 			'src/js/filter/FilterToolbar.js',

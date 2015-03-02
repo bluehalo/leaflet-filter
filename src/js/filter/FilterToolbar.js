@@ -4,7 +4,8 @@
 	L.FilterToolbar = L.FontAwesomeToolbar.extend({
 
 		options: {
-			rectangle: {}
+			rectangle: {},
+			polygon: {}
 		},
 
 		initialize: function (options) {
@@ -29,6 +30,14 @@
 					handler: new L.Filter.Rectangle(map, this.options.rectangle),
 					title: L.filterLocal.filter.toolbar.buttons.rectangle,
 					icon: 'fa fa-square-o'
+				});
+			}
+			if(null != L.Filter.Polygon){
+				handlers.push({
+					enabled: this.options.polygon,
+					handler: new L.Filter.Polygon(map, this.options.polygon),
+					title: L.filterLocal.filter.toolbar.buttons.polygon,
+					icon: 'fa fa-play'
 				});
 			}
 			if(null != L.Filter.Clear){
