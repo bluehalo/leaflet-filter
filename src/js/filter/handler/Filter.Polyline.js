@@ -180,6 +180,8 @@
 			
 			// Remove the rubberband dashed guide line from the UI
 			this._clearGuides();
+			
+			this._clearMouseMarker();
 		},
 
 		//Called to verify the shape is valid when the user tries to finish it
@@ -347,6 +349,19 @@
 			}
 		},
 
+		/**
+		 * Remove the Mouse Marker from the Map, or it will mask the click/drag
+		 * events on the last placed point, preventing it from being editable after
+		 * the shape is finished.
+		 */
+		_clearMouseMarker: function() {
+			if(this._mouseMarker) {
+				// remove the mouse marker from the first point placement
+				this._map.removeLayer(this._mouseMarker);
+				delete this._mouseMarker;
+			}
+		},
+		
 		// removes all child elements (guide dashes) from the guides container
 		_clearGuides: function () {
 			if (this._guidesContainer) {
