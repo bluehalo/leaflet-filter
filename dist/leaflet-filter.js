@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.2.5 */
+/*! leaflet-filter Version: 0.2.6 */
 (function(){
 	"use strict";
 
@@ -1014,6 +1014,18 @@
 			var shape = this._drawShape(filter.latlngs);
 
 			return shape;
+		},
+		
+		equals: function(shape1, shape2) {
+			if(shape1.type != shape2.type) {
+				return false;
+			}
+			
+			// maintain order of nested arrays by serializing to a string, then comparing
+			var shape1LatLng = JSON.stringify(shape1.latlngs),
+				shape2LatLng = JSON.stringify(shape2.latlngs);
+			
+			return (shape1LatLng == shape2LatLng);
 		},
 		
 		// Get the geo representation of the current filter box
