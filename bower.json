@@ -3,7 +3,8 @@
   "version": "0.2.6",
   "authors": [
     "reblace <reblace@gmail.com>",
-    "brianghig <brianghig@gmail.com>"
+    "brianghig <brianghig@gmail.com>",
+    "amarcus <andrew@amarcus.org>"
   ],
   "main": "leaflet-filter.js",
   "scripts": [

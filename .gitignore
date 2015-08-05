@@ -18,3 +18,4 @@ node_modules
 
 # Bower modules
 src/lib
+*.iml

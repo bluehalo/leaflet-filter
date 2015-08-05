@@ -5,7 +5,8 @@
 
 		options: {
 			rectangle: {},
-			polygon: {}
+			polygon: {},
+			circle: {}
 		},
 
 		initialize: function (options) {
@@ -38,6 +39,14 @@
 					handler: new L.Filter.Polygon(map, this.options.polygon),
 					title: L.filterLocal.filter.toolbar.buttons.polygon,
 					icon: 'fa icon-hex'
+				});
+			}
+			if(null != L.Filter.Circle){
+				handlers.push({
+					enabled: this.options.circle,
+					handler: new L.Filter.Circle(map, this.options.circle),
+					title: L.filterLocal.filter.toolbar.buttons.circle,
+					icon: 'fa fa-circle-o'
 				});
 			}
 			if(null != L.Filter.Clear){
