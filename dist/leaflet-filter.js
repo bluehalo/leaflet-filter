@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.2.6 */
+/*! leaflet-filter Version: 0.2.7 */
 (function(){
 	"use strict";
 
