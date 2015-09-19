@@ -1,6 +1,6 @@
 {
 	"name": "leaflet-filter",
-	"version": "0.2.8",
+	"version": "0.2.9-SNAPSHOT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Asymmetrik/leaflet-filter.git"
