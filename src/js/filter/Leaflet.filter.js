@@ -12,6 +12,7 @@
 					rectangle: 'Draw a bounding box filter',
 					polygon: 'Draw a bounding polygon filter',
 					polyline: 'Draw a multipoint line',
+					circle: 'Draw a bounding circle filter',
 					disabled: 'Filter already applied',
 					clear: 'Clear current filter',
 					clearDisabled: 'No active filter'
@@ -36,6 +37,11 @@
 				polygon: {
 					tooltip: {
 						start: 'Click to draw polygon points.'
+					}
+				},
+				circle: {
+					tooltip: {
+						start: 'Click and drag to draw circle.'
 					}
 				}
 			}

@@ -97,7 +97,7 @@
 			this._actionsContainer = null;
 		},
 	
-		_initModeHandler: function (handler, container, buttonIndex, classNamePredix, buttonTitle, buttonIcon) {
+		_initModeHandler: function (handler, container, buttonIndex, classNamePrefix, buttonTitle, buttonIcon) {
 			var type = handler.type;
 	
 			this._modes[type] = {};
@@ -107,7 +107,7 @@
 			this._modes[type].button = this._createButton({
 				title: buttonTitle,
 				icon: buttonIcon,
-				className: classNamePredix + '-' + type,
+				className: classNamePrefix + '-' + type,
 				container: container,
 				callback: this._modes[type].handler.enable,
 				context: this._modes[type].handler

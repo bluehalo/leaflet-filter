@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.2.7 */
+/*! leaflet-filter Version: 0.2.8 */
 (function(){
 	"use strict";
 
@@ -98,7 +98,7 @@
 			this._actionsContainer = null;
 		},
 	
-		_initModeHandler: function (handler, container, buttonIndex, classNamePredix, buttonTitle, buttonIcon) {
+		_initModeHandler: function (handler, container, buttonIndex, classNamePrefix, buttonTitle, buttonIcon) {
 			var type = handler.type;
 	
 			this._modes[type] = {};
@@ -108,7 +108,7 @@
 			this._modes[type].button = this._createButton({
 				title: buttonTitle,
 				icon: buttonIcon,
-				className: classNamePredix + '-' + type,
+				className: classNamePrefix + '-' + type,
 				container: container,
 				callback: this._modes[type].handler.enable,
 				context: this._modes[type].handler
@@ -268,6 +268,7 @@
 					rectangle: 'Draw a bounding box filter',
 					polygon: 'Draw a bounding polygon filter',
 					polyline: 'Draw a multipoint line',
+					circle: 'Draw a bounding circle filter',
 					disabled: 'Filter already applied',
 					clear: 'Clear current filter',
 					clearDisabled: 'No active filter'
@@ -292,6 +293,11 @@
 				polygon: {
 					tooltip: {
 						start: 'Click to draw polygon points.'
+					}
+				},
+				circle: {
+					tooltip: {
+						start: 'Click and drag to draw circle.'
 					}
 				}
 			}
@@ -461,8 +467,8 @@
 
 			this._tooltip.updatePosition(latlng);
 			if (this._isDrawing) {
-				this._tooltip.updateContent(this._getTooltipText());
 				this._drawShape(latlng);
+				this._tooltip.updateContent(this._getTooltipText());
 			}
 		},
 
@@ -1136,6 +1142,112 @@
 
 	L.Filter = L.Filter || {};
 
+	L.Filter.Circle = L.Filter.SimpleShape.extend({
+		statics: {
+			TYPE: 'circle'
+		},
+
+		options: {
+			shapeOptions: {
+				stroke: true,
+				color: '#f06eaa',
+				weight: 4,
+				opacity: 0.5,
+				fill: true,
+				fillColor: null, //same as color by default
+				fillOpacity: 0.2,
+				clickable: true,
+				editable: true
+			},
+			showRadius: true,
+			metric: true // Whether to use the metric meaurement system or imperial
+		},
+
+		initialize: function (map, options) {
+			// Save the type so super can fire, need to do this as cannot do this.TYPE :(
+			this.type = L.Filter.Circle.TYPE;
+			this._initialLabelText = L.filterLocal.filter.handlers.circle.tooltip.start;
+			L.Filter.SimpleShape.prototype.initialize.call(this, map, options);
+		},
+
+		// Get the geo representation of the current filter box
+		getGeo: function(layer){
+			var center = layer.getLatLng();
+			var radius = layer.getRadius();
+			return {
+				type: 'circle',
+				center: center,
+				radius: radius
+			};
+		},
+
+		// Programmatic way to draw a filter circle
+		setFilter: function(filter) {
+			this._startLatLng = filter.center;
+
+			// Render the circle
+			if (!this._shape) {
+				this._shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
+				this._map.addLayer(this._shape);
+			}
+			else {
+				this._shape.setLatLng(filter.center).setRadius(filter.radius);
+			}
+
+			return { type: 'circle', 'layer': this._shape };
+		},
+
+		equals: function(shape1, shape2) {
+			if(shape1.type != shape2.type) {
+				return false;
+			}
+
+			return (shape1.center.lat === shape2.center.lat &&
+					shape1.center.lng === shape2.center.lng &&
+					shape1.radius === shape2.radius);
+		},
+
+		_drawShape: function (latlng) {
+			if (!this._shape) {
+				this._shape = new L.Circle(this._startLatLng, this._startLatLng.distanceTo(latlng), this.options.shapeOptions);
+				this._map.addLayer(this._shape);
+			}
+			else {
+				this._shape.setRadius(this._startLatLng.distanceTo(latlng));
+			}
+			return { type: 'circle', layer: this._shape };
+		},
+
+		_fireCreatedEvent: function () {
+			var circle = new L.Circle(this._shape.getLatLng(), this._shape.getRadius(), this.options.shapeOptions);
+			L.Filter.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
+		},
+
+		_getTooltipText: function () {
+			var tooltipText = L.Filter.SimpleShape.prototype._getTooltipText.call(this),
+				shape = this._shape,
+				latLngs, area, subtext;
+
+			if (shape) {
+				latLngs = this._shape.getBounds();
+				area = L.GeometryUtil.geodesicArea(latLngs) / 4 * Math.PI;
+				subtext = L.GeometryUtil.readableArea(area, this.options.metric);
+			}
+
+			return {
+				text: tooltipText.text,
+				subtext: subtext
+			};
+		}
+
+	});
+
+})();
+(function(){
+	"use strict";
+
+	L.Filter = L.Filter || {};
+
 	L.Filter.Clear = L.Handler.extend({
 		statics: {
 			TYPE: 'clear'
@@ -1181,8 +1293,9 @@
 		options: {
 			position: 'topleft',
 			filter: {
-				rectangle: {},
-				polygon: {}
+				rectangle: { test: 'foo' },
+				polygon: {},
+				circle: {}
 			}
 		},
 
@@ -1197,7 +1310,6 @@
 
 		onAdd: function (map) {
 			var container = L.DomUtil.create('div', 'leaflet-draw'),
-				addedTopClass = false,
 				topClassName = 'leaflet-draw-toolbar-top',
 				toolbarContainer;
 
@@ -1205,11 +1317,8 @@
 	
 			if (toolbarContainer) {
 				// Add class to the first toolbar to remove the margin
-				if (!addedTopClass) {
-					if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
-						L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
-					}
-					addedTopClass = true;
+				if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
+					L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
 				}
 				container.appendChild(toolbarContainer);
 			}
@@ -1338,11 +1447,15 @@
 
 		options: {
 			rectangle: {},
-			polygon: {}
+			polygon: {},
+			circle: {}
 		},
 
 		initialize: function (options) {
-			// Ensure that the options are merged correctly since L.extend is only shallow
+			/*
+			 * Override default options based on what is passed in
+			 * Set the options to be the combination of what was passed in and what is default
+			 */
 			for (var type in this.options) {
 				if (this.options.hasOwnProperty(type)) {
 					if (options[type]) {
@@ -1351,6 +1464,8 @@
 				}
 			}
 
+			// Set this.options to be options since we have already extended the options
+			this.options = options;
 			this._toolbarClass = 'leaflet-draw-filter';
 			L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 		},
@@ -1371,6 +1486,14 @@
 					handler: new L.Filter.Polygon(map, this.options.polygon),
 					title: L.filterLocal.filter.toolbar.buttons.polygon,
 					icon: 'fa icon-hex'
+				});
+			}
+			if(null != L.Filter.Circle){
+				handlers.push({
+					enabled: this.options.circle,
+					handler: new L.Filter.Circle(map, this.options.circle),
+					title: L.filterLocal.filter.toolbar.buttons.circle,
+					icon: 'fa fa-circle-o'
 				});
 			}
 			if(null != L.Filter.Clear){

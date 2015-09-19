@@ -22,6 +22,7 @@ gulp.task('js', function(){
 			'src/js/filter/handler/Filter.Rectangle.js',
 			'src/js/filter/handler/Filter.Polyline.js',
 			'src/js/filter/handler/Filter.Polygon.js',
+			'src/js/filter/handler/Filter.Circle.js',
 			'src/js/filter/handler/Filter.Clear.js',
 			'src/js/filter/Control.Filter.js',
 			'src/js/filter/FilterToolbar.js',
@@ -29,7 +30,7 @@ gulp.task('js', function(){
 		])
 
 		// JS Hint
-		.pipe(plugins.jshint('.jshintrc'))
+		.pipe(plugins.jshint())
 		.pipe(plugins.jshint.reporter('jshint-stylish'))
 
 		// Concatenate

@@ -5,11 +5,15 @@
 
 		options: {
 			rectangle: {},
-			polygon: {}
+			polygon: {},
+			circle: {}
 		},
 
 		initialize: function (options) {
-			// Ensure that the options are merged correctly since L.extend is only shallow
+			/*
+			 * Override default options based on what is passed in
+			 * Set the options to be the combination of what was passed in and what is default
+			 */
 			for (var type in this.options) {
 				if (this.options.hasOwnProperty(type)) {
 					if (options[type]) {
@@ -18,6 +22,8 @@
 				}
 			}
 
+			// Set this.options to be options since we have already extended the options
+			this.options = options;
 			this._toolbarClass = 'leaflet-draw-filter';
 			L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 		},
@@ -38,6 +44,14 @@
 					handler: new L.Filter.Polygon(map, this.options.polygon),
 					title: L.filterLocal.filter.toolbar.buttons.polygon,
 					icon: 'fa icon-hex'
+				});
+			}
+			if(null != L.Filter.Circle){
+				handlers.push({
+					enabled: this.options.circle,
+					handler: new L.Filter.Circle(map, this.options.circle),
+					title: L.filterLocal.filter.toolbar.buttons.circle,
+					icon: 'fa fa-circle-o'
 				});
 			}
 			if(null != L.Filter.Clear){

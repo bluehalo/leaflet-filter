@@ -1,9 +1,10 @@
 {
   "name": "leaflet-filter",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "authors": [
     "reblace <reblace@gmail.com>",
-    "brianghig <brianghig@gmail.com>"
+    "brianghig <brianghig@gmail.com>",
+    "amarcus <andrew@amarcus.org>"
   ],
   "main": "leaflet-filter.js",
   "scripts": [

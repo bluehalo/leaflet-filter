@@ -6,8 +6,9 @@
 		options: {
 			position: 'topleft',
 			filter: {
-				rectangle: {},
-				polygon: {}
+				rectangle: { test: 'foo' },
+				polygon: {},
+				circle: {}
 			}
 		},
 
@@ -22,7 +23,6 @@
 
 		onAdd: function (map) {
 			var container = L.DomUtil.create('div', 'leaflet-draw'),
-				addedTopClass = false,
 				topClassName = 'leaflet-draw-toolbar-top',
 				toolbarContainer;
 
@@ -30,11 +30,8 @@
 	
 			if (toolbarContainer) {
 				// Add class to the first toolbar to remove the margin
-				if (!addedTopClass) {
-					if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
-						L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
-					}
-					addedTopClass = true;
+				if (!L.DomUtil.hasClass(toolbarContainer, topClassName)) {
+					L.DomUtil.addClass(toolbarContainer.childNodes[0], topClassName);
 				}
 				container.appendChild(toolbarContainer);
 			}
