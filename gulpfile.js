@@ -30,7 +30,7 @@ gulp.task('js', function(){
 		])
 
 		// JS Hint
-		.pipe(plugins.jshint('.jshintrc'))
+		.pipe(plugins.jshint())
 		.pipe(plugins.jshint.reporter('jshint-stylish'))
 
 		// Concatenate

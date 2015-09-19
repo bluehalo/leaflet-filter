@@ -1,4 +1,4 @@
-/*! leaflet-filter Version: 0.2.7 */
+/*! leaflet-filter Version: 0.2.8 */
 (function(){
 	"use strict";
 
@@ -98,7 +98,7 @@
 			this._actionsContainer = null;
 		},
 	
-		_initModeHandler: function (handler, container, buttonIndex, classNamePredix, buttonTitle, buttonIcon) {
+		_initModeHandler: function (handler, container, buttonIndex, classNamePrefix, buttonTitle, buttonIcon) {
 			var type = handler.type;
 	
 			this._modes[type] = {};
@@ -108,7 +108,7 @@
 			this._modes[type].button = this._createButton({
 				title: buttonTitle,
 				icon: buttonIcon,
-				className: classNamePredix + '-' + type,
+				className: classNamePrefix + '-' + type,
 				container: container,
 				callback: this._modes[type].handler.enable,
 				context: this._modes[type].handler
@@ -1293,7 +1293,7 @@
 		options: {
 			position: 'topleft',
 			filter: {
-				rectangle: {},
+				rectangle: { test: 'foo' },
 				polygon: {},
 				circle: {}
 			}
@@ -1452,7 +1452,10 @@
 		},
 
 		initialize: function (options) {
-			// Ensure that the options are merged correctly since L.extend is only shallow
+			/*
+			 * Override default options based on what is passed in
+			 * Set the options to be the combination of what was passed in and what is default
+			 */
 			for (var type in this.options) {
 				if (this.options.hasOwnProperty(type)) {
 					if (options[type]) {
@@ -1461,6 +1464,8 @@
 				}
 			}
 
+			// Set this.options to be options since we have already extended the options
+			this.options = options;
 			this._toolbarClass = 'leaflet-draw-filter';
 			L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 		},

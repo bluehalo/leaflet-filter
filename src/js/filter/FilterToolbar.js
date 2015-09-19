@@ -10,7 +10,10 @@
 		},
 
 		initialize: function (options) {
-			// Ensure that the options are merged correctly since L.extend is only shallow
+			/*
+			 * Override default options based on what is passed in
+			 * Set the options to be the combination of what was passed in and what is default
+			 */
 			for (var type in this.options) {
 				if (this.options.hasOwnProperty(type)) {
 					if (options[type]) {
@@ -19,6 +22,8 @@
 				}
 			}
 
+			// Set this.options to be options since we have already extended the options
+			this.options = options;
 			this._toolbarClass = 'leaflet-draw-filter';
 			L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 		},

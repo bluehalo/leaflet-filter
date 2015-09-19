@@ -6,7 +6,7 @@
 		options: {
 			position: 'topleft',
 			filter: {
-				rectangle: {},
+				rectangle: { test: 'foo' },
 				polygon: {},
 				circle: {}
 			}
