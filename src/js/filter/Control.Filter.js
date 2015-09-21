@@ -69,16 +69,19 @@
 				return;
 			}
 
-			if(null != filter) {
+			var filterObject;
+			if (null != filter) {
 				// Ask the handler for the filter object
-				var filterObject = this._toolbar.setFilter(filter);
-
+				filterObject = this._toolbar.setFilter(filter);
+			}
+			if (null != filterObject) {
 				// Clear the old filter
 				this._clearFilter(true);
 
 				// Create the new filter
 				this._createFilter(filterObject);
-			} else {
+			}
+			else {
 				this._clearFilter();
 			}
 		},
