@@ -1,42 +1,20 @@
-(function(){
-	"use strict";
+L.Filter = (null != L.Filter) ? L.Filter : {};
 
-	L.Filter = L.Filter || {};
+L.Filter.Clear = L.EditToolbar.Delete.extend({
 
-	L.Filter.Clear = L.Handler.extend({
-		statics: {
-			TYPE: 'clear'
-		},
+	statics: {
+		TYPE: 'clear'
+	},
 
-		includes: L.Mixin.Events,
+	includes: [ L.Mixin.Events ],
 
-		initialize: function (map, options) {
-			L.Handler.prototype.initialize.call(this, map);
-			L.Util.setOptions(this, options);
-			this.type = L.Filter.Clear.TYPE;
-		},
+	// @method intialize(): void
+	initialize: function (map, options) {
+		L.EditToolbar.Delete.prototype.initialize.call(this, map, options);
 
-		lock: function(){
-			this._locked = true;
-		},
+		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
+		this.type = L.Filter.Clear.TYPE;
+	}
 
-		unlock: function(){
-			this._locked = false;
-		},
 
-		isLocked: function(){
-			return (null != this._locked && this._locked);
-		},
-	
-		enable: function () {
-			if(!this.isLocked()){
-				this._map.fire('filter:cleared');
-			}
-		},
-
-		disable: function () {
-		}
-
-	});
-
-})();
+});

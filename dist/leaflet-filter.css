@@ -1,7 +1,4 @@
-/*! leaflet-filter Version: 0.2.9-SNAPSHOT */
-@import url("icons/filter.css");/* ================================================================== */
-/* Font-awesome toolbar
-/* ================================================================== */
-.leaflet-draw-toolbar.leaflet-fa-toolbar a {
-	background-image: none;
-}
+/*! @asymmetrik/leaflet-filter-1.0.0 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/.leaflet-draw-toolbar .leaflet-draw-draw-clear {
+  background-position: -182px -2px; }
+
+/*# sourceMappingURL=leaflet-filter.css.map */

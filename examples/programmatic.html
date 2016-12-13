@@ -3,19 +3,19 @@
 <head>
 	<title>Leaflet.draw filter control</title>
 
-	<link rel="stylesheet" href="../src/lib/fontawesome/css/font-awesome.css" />
-	<link rel="stylesheet" href="../src/lib/leaflet/dist/leaflet.css" />
-	<link rel="stylesheet" href="../src/lib/leaflet.draw/dist/leaflet.draw.css" />
-	<link rel="stylesheet" href="../dist/leaflet-filter.css" />
+	<link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css" />
+	<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css" />
+	<link rel="stylesheet" href="../node_modules/leaflet-draw/dist/leaflet.draw-src.css" />
 
-	<script src="../src/lib/leaflet/dist/leaflet-src.js"></script>
-	<script src="../src/lib/leaflet.draw/dist/leaflet.draw-src.js"></script>
+	<script src="../node_modules/leaflet/dist/leaflet-src.js"></script>
+	<script src="../node_modules/leaflet-draw/dist/leaflet.draw-src.js"></script>
 
 	<script src="../dist/leaflet-filter.js"></script>
 
 </head>
 <body>
-	<div id="map" style="width: 600px; height: 400px; border: 1px solid #ccc"></div>
+	<div id="map" style="height: 400px; border: 1px solid #ccc"></div>
+
 	<button onclick="createRectangleFn()">Create Random Rectangle</button>
 	<button onclick="createPolygonFn()">Create Random Polygon</button>
 	<button onclick="resetFn()">Reset</button>
@@ -23,22 +23,28 @@
 
 	<script>
 
-		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-			osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-			osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
-			map = new L.Map('map', {layers: [osm], center: new L.LatLng(51.505, -0.04), zoom: 13});
+		var center = [ 38.991709, -76.886109 ];
+		var layer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		});
 
-		var drawnItems = new L.FeatureGroup();
-		map.addLayer(drawnItems);
+		var map = L.map('map', {
+			layers: [ layer ],
+			center: L.latLng(center[0], center[1]), zoom: 7
+		});
 
-		var control = new L.Control.Filter({
+		var drawnItems = L.featureGroup();
+		drawnItems.addTo(map);
+
+		var control = new L.control.filter({
 			position: 'topright',
 			filter: {
 				rectangle: {}
 			},
 			filterGroup: drawnItems
 		});
-		map.addControl(control);
+		control.addTo(map);
 
 		map.on('filter:filter', function (e) {
 			console.log(e);
@@ -57,7 +63,7 @@
 				}
 			});
 		}
-		
+
 		function createPolygonFn(){
 			control.setFilter({
 				type: 'polygon',

@@ -3,40 +3,51 @@
 <head>
 	<title>Leaflet.draw filter control</title>
 
-	<link rel="stylesheet" href="../src/lib/fontawesome/css/font-awesome.css" />
-	<link rel="stylesheet" href="../src/lib/leaflet/dist/leaflet.css" />
-	<link rel="stylesheet" href="../src/lib/leaflet.draw/dist/leaflet.draw.css" />
-	<link rel="stylesheet" href="../dist/leaflet-filter.css" />
+	<link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css" />
+	<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css" />
+	<link rel="stylesheet" href="../node_modules/leaflet-draw/dist/leaflet.draw-src.css" />
 
-	<script src="../src/lib/leaflet/dist/leaflet-src.js"></script>
-	<script src="../src/lib/leaflet.draw/dist/leaflet.draw-src.js"></script>
+	<script src="../node_modules/leaflet/dist/leaflet-src.js"></script>
+	<script src="../node_modules/leaflet-draw/dist/leaflet.draw-src.js"></script>
 
 	<script src="../dist/leaflet-filter.js"></script>
 
 </head>
 <body>
-	<div id="rectangle" style="width: 300px; height: 150px; border: 1px solid #ccc"></div>
-	<div id="polygon" style="width: 300px; height: 150px; border: 1px solid #ccc"></div>
-	<div id="circle" style="width: 300px; height: 150px; border: 1px solid #ccc"></div>
+	<div id="rectangle" style="height: 150px; border: 1px solid #ccc"></div>
+	<div id="polygon" style="height: 150px; border: 1px solid #ccc"></div>
+	<div id="circle" style="height: 150px; border: 1px solid #ccc"></div>
 
 	<script>
 		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 		(['rectangle', 'polygon', 'circle']).forEach(function(element) {
-			var osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
-			var map = new L.Map(element, {layers: [osm], center: new L.LatLng(51.505, -0.04), zoom: 13});
-			var drawnItems = new L.FeatureGroup();
-			map.addLayer(drawnItems);
+
+			var center = [ 38.991709, -76.886109 ];
+			var layer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			});
+
+			var map = L.map('map', {
+				layers: [ layer ],
+				center: L.latLng(center[0], center[1]), zoom: 7
+			});
+
+			var drawnItems = L.featureGroup();
+			drawItems.addTo(map);
+
 			var types = {};
 			types[element] = {};
 
-			var control = new L.Control.Filter({
+			var control = new L.control.filter({
 				position: 'topright',
 				filter: types,
 				filterGroup: drawnItems
 			});
-			map.addControl(control);
+			control.addTo(map);
+
 		});
 
 	</script>
