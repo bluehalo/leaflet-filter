@@ -17,7 +17,11 @@ module.exports = {
 		js: 'src/js/**/*.js',
 		sass: [
 			'src/sass/**/*.scss'
-		]
+		],
+		fonts: {
+			dir: [ 'src/sass/fonts/*' ],
+			base: 'src/sass'
+		}
 	},
 
 	// Distribution related items

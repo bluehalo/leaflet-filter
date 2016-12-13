@@ -14,7 +14,7 @@ let
 
 
 // Banner to append to generated files
-let bannerString = '/*! ' + pkg.name + '-' + pkg.version + ' - ' + pkg.copyright + '*/'
+let bannerString = '/*! ' + pkg.name + '-' + pkg.version + ' - ' + pkg.copyright + '*/\n'
 
 
 /**
@@ -98,6 +98,11 @@ gulp.task('build-css', () => {
 
 });
 
+gulp.task('copy-fonts', () => {
+	return gulp.src(assets.src.fonts.dir, { base: assets.src.fonts.base })
+		.pipe(gulp.dest(assets.dist.dir));
+});
+
 gulp.task('watch', [ 'build' ], () => {
 	gulp.watch([ assets.src.js, assets.src.sass ], [ 'build' ]);
 });
@@ -109,7 +114,7 @@ gulp.task('watch', [ 'build' ], () => {
  * --------------------------
  */
 
-gulp.task('build', (done) => { runSequence('validate-js', [ 'build-js', 'build-css' ], done); } );
+gulp.task('build', (done) => { runSequence('validate-js', [ 'build-js', 'build-css', 'copy-fonts' ], done); } );
 
 // Default task builds and tests
 gulp.task('default', [ 'build' ]);

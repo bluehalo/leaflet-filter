@@ -34,14 +34,14 @@
 		var drawnItems = L.featureGroup();
 		drawnItems.addTo(map);
 
-		var control = new L.control.filter({
+		var control = L.control.filter({
 			position: 'topright',
 			filter: {
 				rectangle: {},
 				polygon: {},
 				circle: {},
-				featureGroup: drawnItems
-			}
+			},
+			featureGroup: drawnItems
 		});
 		control.addTo(map);
 

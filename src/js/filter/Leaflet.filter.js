@@ -8,6 +8,7 @@ L.filterLocal = {
 			buttons: {
 				rectangle: 'Draw a bounding box filter',
 				polygon: 'Draw a bounding polygon filter',
+				polyline: 'Draw a multipoint line',
 				circle: 'Draw a bounding circle filter',
 				disabled: 'Filter already applied',
 				clear: 'Clear current filter',
@@ -27,7 +28,7 @@ L.filterLocal = {
 			},
 			polyline: {
 				tooltip: {
-					start: 'Not used',
+					start: 'Click to draw multiple points.'
 				}
 			},
 			polygon: {

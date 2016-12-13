@@ -7,6 +7,8 @@
 	<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css" />
 	<link rel="stylesheet" href="../node_modules/leaflet-draw/dist/leaflet.draw-src.css" />
 
+	<link rel="stylesheet" href="../dist/leaflet-filter.css" />
+
 	<script src="../node_modules/leaflet/dist/leaflet-src.js"></script>
 	<script src="../node_modules/leaflet-draw/dist/leaflet.draw-src.js"></script>
 
@@ -40,9 +42,10 @@
 		var control = new L.control.filter({
 			position: 'topright',
 			filter: {
-				rectangle: {}
+				rectangle: {},
+				polygon: {}
 			},
-			filterGroup: drawnItems
+			featureGroup: drawnItems
 		});
 		control.addTo(map);
 
@@ -54,12 +57,12 @@
 			control.setFilter({
 				type: 'rectangle',
 				northEast: {
-					lat: 51.51739577570338 + (Math.random()*0.0125 - 0.00625),
-					lng: -0.02506256103515625 + (Math.random()*0.0125 - 0.00625)
+					lat: center[0] + (Math.random()*0.3 + 1),
+					lng: center[1] + (Math.random()*0.3 + 1)
 				},
 				southWest: {
-					lat: 51.49944632447973 + (Math.random()*0.0125 - 0.00625),
-					lng: -0.05424499511718749 + (Math.random()*0.0125 - 0.00625)
+					lat: center[0] + (Math.random()*0.3 - 1),
+					lng: center[1] + (Math.random()*0.3 - 1)
 				}
 			});
 		}
@@ -68,25 +71,15 @@
 			control.setFilter({
 				type: 'polygon',
 				latlngs: [
-					[ 51.51739577570338 + (Math.random()*0.0125 - 0.00625), -0.05424499511718749 ],
-					[ 51.51739577570338 + (Math.random()*0.0125 - 0.00625), -0.02506256103515625 ],
-					[ 51.49944632447973 + (Math.random()*0.0125 - 0.00625), -0.02506256103515625 ]
+					[ center[0] + (Math.random()*0.3 + 0.6), center[1] - 1 ],
+					[ center[0] + (Math.random()*0.3 + 1.0), center[1] + 1 ],
+					[ center[0] + (Math.random()*0.3 - 0.6), center[1] + 1 ]
 				]
 			});
 		}
 
 		function resetFn(){
-			control.setFilter({
-				type: 'rectangle',
-				northEast: {
-					lat: 51.51739577570338,
-					lng: -0.02506256103515625
-				},
-				southWest: {
-					lat: 51.49944632447973,
-					lng: -0.05424499511718749
-				}
-			});
+			control.setFilter(undefined);
 		}
 
 		function clearFn(){

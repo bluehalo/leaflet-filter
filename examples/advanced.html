@@ -7,6 +7,8 @@
 	<link rel="stylesheet" href="../node_modules/leaflet/dist/leaflet.css" />
 	<link rel="stylesheet" href="../node_modules/leaflet-draw/dist/leaflet.draw-src.css" />
 
+	<link rel="stylesheet" href="../dist/leaflet-filter.css" />
+
 	<script src="../node_modules/leaflet/dist/leaflet-src.js"></script>
 	<script src="../node_modules/leaflet-draw/dist/leaflet.draw-src.js"></script>
 
@@ -15,12 +17,12 @@
 </head>
 <body>
 	<div id="rectangle" style="height: 150px; border: 1px solid #ccc"></div>
+
 	<div id="polygon" style="height: 150px; border: 1px solid #ccc"></div>
+
 	<div id="circle" style="height: 150px; border: 1px solid #ccc"></div>
 
 	<script>
-		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-			osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 		(['rectangle', 'polygon', 'circle']).forEach(function(element) {
 
@@ -30,13 +32,13 @@
 				attribution: '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			});
 
-			var map = L.map('map', {
+			var map = L.map(element, {
 				layers: [ layer ],
 				center: L.latLng(center[0], center[1]), zoom: 7
 			});
 
 			var drawnItems = L.featureGroup();
-			drawItems.addTo(map);
+			drawnItems.addTo(map);
 
 			var types = {};
 			types[element] = {};
@@ -44,7 +46,7 @@
 			var control = new L.control.filter({
 				position: 'topright',
 				filter: types,
-				filterGroup: drawnItems
+				featureGroup: drawnItems
 			});
 			control.addTo(map);
 

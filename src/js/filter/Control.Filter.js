@@ -1,11 +1,3 @@
-/**
- * Filter Control
- * This control utilizes the Leaflet Draw plugin, allowing users to draw one shape and firing events
- * when the filter state changes from filtered to not filtered based on the presence or absence of
- * a shape.
- *
- * L is defined by the Leaflet library, see git://github.com/Leaflet/Leaflet.git for documentation
- */
 L.Control.Filter = L.Control.extend({
 
 	options: {
@@ -13,13 +5,16 @@ L.Control.Filter = L.Control.extend({
 		filter: {
 			rectangle: {},
 			polygon: {},
-			circle: {},
-			featureGroup: null
+			circle: {}
 		}
 	},
 
 	initialize: function (options) {
 		L.Control.prototype.initialize.call(this, options);
+
+		if (null == options.featureGroup || !(options.featureGroup instanceof L.FeatureGroup)) {
+			throw new Error('options.featureGroup must be an L.FeatureGroup');
+		}
 
 		// Initialize toolbars
 		if (L.FilterToolbar && this.options.filter) {
@@ -54,9 +49,9 @@ L.Control.Filter = L.Control.extend({
 		map.off('filter:created', this._filterCreatedHandler, this);
 		map.off('filter:cleared', this._filterClearedHandler, this);
 
-		if (null != this._featureGroup) {
+		if (null != this._filterState) {
 			// Unregister for the edit events
-			this._featureGroup.shape.off('edit', this._filterUpdatedHandler, this);
+			this._filterState.shape.off('edit', this._filterUpdatedHandler, this);
 		}
 
 		this._toolbar.removeToolbar();
@@ -69,19 +64,16 @@ L.Control.Filter = L.Control.extend({
 	// Public method to programatically set the state of the filter
 	setFilter: function(filter) {
 		// Check to see if a change is being applied
-		var shape1 = (null != this._featureGroup)? this._getGeo(this._featureGroup.type, this._featureGroup.shape) : undefined;
-
+		var shape1 = (null != this._filterState)? this._getGeo(this._filterState.type, this._filterState.shape) : undefined;
 		// If there is no change, then we're just going to short circuit out of here
 		if(this._toolbar.equals(shape1, filter)) {
 			return;
 		}
 
-		var filterObject;
-		if (null != filter) {
+		if(null != filter) {
 			// Ask the handler for the filter object
-			filterObject = this._toolbar.setFilter(filter);
-		}
-		if (null != filterObject) {
+			var filterObject = this._toolbar.setFilter(filter);
+
 			// Clear the old filter
 			this._clearFilter(true);
 
@@ -98,13 +90,13 @@ L.Control.Filter = L.Control.extend({
 		this.options.featureGroup.addLayer(filter.layer);
 
 		// Store the internal representation of the filter state
-		this._featureGroup = { shape: filter.layer, type: filter.type };
+		this._filterState = { shape: filter.layer, type: filter.type };
 
 		// Register for the edit events on the filter shape
-		this._featureGroup.shape.on('edit', this._filterUpdatedHandler, this);
+		this._filterState.shape.on('edit', this._filterUpdatedHandler, this);
 
 		// Fire the event that we've updated the filter
-		if (!suppressEvent) { this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) }); }
+		if(!suppressEvent) { this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) }); }
 
 		// Set the filtered state on the toolbar
 		this._toolbar.setFiltered(true);
@@ -113,10 +105,10 @@ L.Control.Filter = L.Control.extend({
 	_clearFilter: function(suppressEvent) {
 		// Remove the filter shape
 		this.options.featureGroup.clearLayers();
-		this._featureGroup = undefined;
+		this._filterState = undefined;
 
 		// Fire the event
-		if (!suppressEvent) { this._map.fire('filter:filter', { geo: undefined }); }
+		if(!suppressEvent) { this._map.fire('filter:filter', { geo: undefined }); }
 
 		// Update the toolbar state
 		this._toolbar.setFiltered(false);
@@ -128,9 +120,9 @@ L.Control.Filter = L.Control.extend({
 
 	_filterUpdatedHandler: function() {
 		// Only process updates when we have a stored filter shape
-		if (null != this._featureGroup) {
+		if(null != this._filterState) {
 			var payload = {
-				geo: this._getGeo(this._featureGroup.type, this._featureGroup.shape)
+				geo: this._getGeo(this._filterState.type, this._filterState.shape)
 			};
 			// Only need to fire event - no need to update the toolbar
 			this._map.fire('filter:filter', payload);
@@ -151,7 +143,7 @@ L.Control.Filter = L.Control.extend({
 });
 
 L.Map.mergeOptions({
-	drawControlTooltips: true,
+	drawControlTooltips: false,
 	filterControl: false
 });
 

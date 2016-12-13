@@ -1,56 +1,92 @@
-L.FilterToolbar = L.DrawToolbar.extend({
-
-	statics: {
-		TYPE: 'filter'
-	},
+L.FilterToolbar = L.FontAwesomeToolbar.extend({
 
 	options: {
-		polygon: {},
 		rectangle: {},
+		polygon: {},
 		circle: {}
 	},
 
 	initialize: function (options) {
-		L.DrawToolbar.prototype.initialize.call(this, options);
-		this._toolbarClass = 'leaflet-draw-draw';
+		/*
+		 * Override default options based on what is passed in
+		 * Set the options to be the combination of what was passed in and what is default
+		 */
+		for (var type in this.options) {
+			if (this.options.hasOwnProperty(type)) {
+				if (options[type]) {
+					options[type] = L.extend({}, this.options[type], options[type]);
+				}
+			}
+		}
+
+		// Set this.options to be options since we have already extended the options
+		this.options = options;
+		this._toolbarClass = 'leaflet-draw-filter';
+		L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 	},
 
 	getModeHandlers: function (map) {
-		return [
-			{
-				enabled: this.options.polygon,
-				handler: new L.Filter.Polygon(map, this.options.polygon),
-				title: L.drawLocal.draw.toolbar.buttons.polygon
-			},
-			{
+		var handlers = [];
+		if(null != L.Filter.Rectangle) {
+			handlers.push({
 				enabled: this.options.rectangle,
 				handler: new L.Filter.Rectangle(map, this.options.rectangle),
-				title: L.drawLocal.draw.toolbar.buttons.rectangle
-			},
-			{
+				title: L.filterLocal.filter.toolbar.buttons.rectangle,
+				icon: 'fa icon-square'
+			});
+		}
+		if(null != L.Filter.Polygon) {
+			handlers.push({
+				enabled: this.options.polygon,
+				handler: new L.Filter.Polygon(map, this.options.polygon),
+				title: L.filterLocal.filter.toolbar.buttons.polygon,
+				icon: 'fa icon-hex'
+			});
+		}
+		if(null != L.Filter.Circle) {
+			handlers.push({
 				enabled: this.options.circle,
 				handler: new L.Filter.Circle(map, this.options.circle),
-				title: L.drawLocal.draw.toolbar.buttons.circle
-			},
-			{
+				title: L.filterLocal.filter.toolbar.buttons.circle,
+				icon: 'fa fa-circle-o'
+			});
+		}
+		if(null != L.Filter.Clear) {
+			handlers.push({
 				enabled: true,
-				handler: new L.Filter.Clear(map, { featureGroup: this.options.featureGroup }),
-				title: L.drawLocal.draw.toolbar.buttons.circle
+				handler: new L.Filter.Clear(map, this.options.clear),
+				title: L.filterLocal.filter.toolbar.buttons.clear,
+				icon: 'fa fa-trash-o'
+			});
+		}
+
+		return handlers;
+	},
+
+	// Get the actions part of the toolbar
+	getActions: function () {
+		return [
+			{
+				title: L.filterLocal.filter.toolbar.actions.title,
+				text: L.filterLocal.filter.toolbar.actions.text,
+				callback: this.disable,
+				context: this
 			}
 		];
 	},
 
-	// Get the actions part of the toolbar
-	getActions: function (handler) {
-		return L.DrawToolbar.prototype.getActions(handler);
-	},
-
 	setOptions: function (options) {
-		L.DrawToolbar.prototype.setOptions(options);
+		L.setOptions(this, options);
+
+		for (var type in this._modes) {
+			if (this._modes.hasOwnProperty(type) && options.hasOwnProperty(type)) {
+				this._modes[type].handler.setOptions(options[type]);
+			}
+		}
 	},
 
-	addTo: function (map) {
-		var container = map.addToolbar(this);
+	addToolbar: function (map) {
+		var container = L.FontAwesomeToolbar.prototype.addToolbar.call(this, map);
 		this.setFiltered(false);
 		return container;
 	},
@@ -58,9 +94,9 @@ L.FilterToolbar = L.DrawToolbar.extend({
 	setFiltered: function(filtered) {
 		var type;
 
-		if (filtered) {
-			for (type in this._modes) {
-				// The draw buttons are disabled when we are filtered
+		if(filtered) {
+			for(type in this._modes) {
+				// The two draw buttons are disabled when we are filtered
 				L.DomUtil.addClass(this._modes[type].button, 'leaflet-disabled');
 				this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons.disabled);
 				this._modes[type].handler.lock();
@@ -72,9 +108,9 @@ L.FilterToolbar = L.DrawToolbar.extend({
 			this._modes.clear.handler.unlock();
 
 		}
-		else {
-			for (type in this._modes) {
-				// The draw buttons are enabled when there are no filters
+ else {
+			for(type in this._modes) {
+				// The two draw buttons are enabled when there are no filters
 				L.DomUtil.removeClass(this._modes[type].button, 'leaflet-disabled');
 				this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons[type]);
 				this._modes[type].handler.unlock();
@@ -88,10 +124,10 @@ L.FilterToolbar = L.DrawToolbar.extend({
 	},
 
 	setFilter: function(filter) {
-		if (null != this._modes[filter.type]) {
+		if(null != this._modes[filter.type]) {
 			return this._modes[filter.type].handler.setFilter(filter);
 		}
-		else {
+ else {
 			console.error('Unsupported filter type: ' + filter.type);
 		}
 	},
@@ -101,17 +137,17 @@ L.FilterToolbar = L.DrawToolbar.extend({
 	},
 
 	equals: function(shape1, shape2) {
-		if (shape1 == null || shape1.type == null) {
+		if(shape1 == null || shape1.type == null) {
 			shape1 = null;
 		}
-		if (shape2 == null || shape2.type == null) {
+		if(shape2 == null || shape2.type == null) {
 			shape2 = null;
 		}
 
-		if (shape1 == null && shape2 == null) {
+		if(shape1 == null && shape2 == null) {
 			return true;
 		}
-		else if (shape1 == null || shape2 == null) {
+ else if(shape1 == null || shape2 == null) {
 			return false;
 		}
 

@@ -1,3 +1,5 @@
-.leaflet-draw-toolbar .leaflet-draw-draw-clear {
-	background-position: -182px -2px;
+@import './icons';
+
+.leaflet-draw-toolbar.leaflet-fa-toolbar a {
+	background-image: none;
 }
