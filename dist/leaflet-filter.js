@@ -1,4 +1,4 @@
-/*! @asymmetrik/leaflet-filter-1.0.1 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter-1.0.2 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -1079,7 +1079,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 		// We don't need to add the circle since it's only added while editing. In this case, we just create a shape and return it
 		var shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
 
-		return { type: 'circle', 'layer': shape };
+		return { type: 'circle', layer: shape };
 	},
 
 	equals: function(shape1, shape2) {
