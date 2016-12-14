@@ -64,18 +64,21 @@ L.Control.Filter = L.Control.extend({
 	// Public method to programatically set the state of the filter
 	setFilter: function(filter) {
 		// Check to see if a change is being applied
-		var shape1 = (null != this._filterState)? this._getGeo(this._filterState.type, this._filterState.shape) : undefined;
+		var shape = (null != this._filterState)?
+			this._getGeo(this._filterState.type, this._filterState.shape)
+			: undefined;
+
 		// If there is no change, then we're just going to short circuit out of here
-		if(this._toolbar.equals(shape1, filter)) {
+		if(this._toolbar.equals(shape, filter)) {
 			return;
 		}
 
 		if(null != filter) {
-			// Ask the handler for the filter object
-			var filterObject = this._toolbar.setFilter(filter);
-
 			// Clear the old filter
 			this._clearFilter(true);
+
+			// Ask the handler for the filter object
+			var filterObject = this._toolbar.setFilter(filter);
 
 			// Create the new filter
 			this._createFilter(filterObject);

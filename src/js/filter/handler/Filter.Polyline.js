@@ -27,7 +27,8 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 			weight: 4,
 			opacity: 0.5,
 			fill: false,
-			clickable: true
+			clickable: true,
+			editable: true
 		},
 		metric: true, // Whether to use the metric meaurement system or imperial
 		showLength: true, // Whether to display distance in the tooltip
@@ -286,7 +287,7 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 		if (this._markers.length === 1) {
 			this._measurementRunningTotal = 0;
 		}
- else {
+		else {
 			previousMarkerIndex = markersLength - (added ? 2 : 1);
 			distance = latlng.distanceTo(this._markers[previousMarkerIndex].getLatLng());
 

@@ -33,9 +33,10 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 	// Programmatic way to draw a filter rectangle (bit of a hack)
 	setFilter: function(filter) {
 
-		var shape = this._drawShape(filter.latlngs);
+		// Create a poly and return it
+		var poly = new L.Polygon(filter.latlngs, this.options.shapeOptions);
+		return { type: 'polygon', layer: poly };
 
-		return shape;
 	},
 
 	equals: function(shape1, shape2) {
@@ -65,7 +66,7 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 			this._poly = new L.Polygon(latlngs, this.options.shapeOptions);
 			this._map.addLayer(this._poly);
 		}
- else {
+		else {
 			this._poly.setLatLngs(latlngs);
 		}
 

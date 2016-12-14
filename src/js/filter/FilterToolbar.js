@@ -108,7 +108,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 			this._modes.clear.handler.unlock();
 
 		}
- else {
+		else {
 			for(type in this._modes) {
 				// The two draw buttons are enabled when there are no filters
 				L.DomUtil.removeClass(this._modes[type].button, 'leaflet-disabled');
@@ -127,7 +127,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		if(null != this._modes[filter.type]) {
 			return this._modes[filter.type].handler.setFilter(filter);
 		}
- else {
+		else {
 			console.error('Unsupported filter type: ' + filter.type);
 		}
 	},
@@ -147,7 +147,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		if(shape1 == null && shape2 == null) {
 			return true;
 		}
- else if(shape1 == null || shape2 == null) {
+		else if(shape1 == null || shape2 == null) {
 			return false;
 		}
 

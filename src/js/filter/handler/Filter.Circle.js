@@ -41,18 +41,13 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 
 	// Programmatic way to draw a filter circle
 	setFilter: function(filter) {
+		// Set startLatLng so edits remember the starting point
 		this._startLatLng = filter.center;
 
-		// Render the circle
-		if (!this._shape) {
-			this._shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
-			this._map.addLayer(this._shape);
-		}
-		else {
-			this._shape.setLatLng(filter.center).setRadius(filter.radius);
-		}
+		// We don't need to add the circle since it's only added while editing. In this case, we just create a shape and return it
+		var shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
 
-		return { type: 'circle', 'layer': this._shape };
+		return { type: 'circle', 'layer': shape };
 	},
 
 	equals: function(shape1, shape2) {

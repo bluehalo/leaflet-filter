@@ -44,19 +44,10 @@ L.Filter.Rectangle = L.Filter.SimpleShape.extend({
 
 	// Programmatic way to draw a filter rectangle (bit of a hack)
 	setFilter: function(filter) {
-		this.enable();
-
-		// init
-		this._isDrawing = true;
 		this._startLatLng = filter.northEast;
 
-		// Update
-		var shape = this._drawShape(filter.southWest);
-
-		// Finish
-		this.disable();
-
-		return shape;
+		var shape = new L.Rectangle(new L.LatLngBounds(this._startLatLng, filter.southWest), this.options.shapeOptions);
+		return { type: 'rectangle', 'layer': shape };
 	},
 
 	equals: function(shape1, shape2) {

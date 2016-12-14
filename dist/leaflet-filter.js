@@ -504,7 +504,8 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 			weight: 4,
 			opacity: 0.5,
 			fill: false,
-			clickable: true
+			clickable: true,
+			editable: true
 		},
 		metric: true, // Whether to use the metric meaurement system or imperial
 		showLength: true, // Whether to display distance in the tooltip
@@ -763,7 +764,7 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 		if (this._markers.length === 1) {
 			this._measurementRunningTotal = 0;
 		}
- else {
+		else {
 			previousMarkerIndex = markersLength - (added ? 2 : 1);
 			distance = latlng.distanceTo(this._markers[previousMarkerIndex].getLatLng());
 
@@ -895,9 +896,10 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 	// Programmatic way to draw a filter rectangle (bit of a hack)
 	setFilter: function(filter) {
 
-		var shape = this._drawShape(filter.latlngs);
+		// Create a poly and return it
+		var poly = new L.Polygon(filter.latlngs, this.options.shapeOptions);
+		return { type: 'polygon', layer: poly };
 
-		return shape;
 	},
 
 	equals: function(shape1, shape2) {
@@ -927,7 +929,7 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 			this._poly = new L.Polygon(latlngs, this.options.shapeOptions);
 			this._map.addLayer(this._poly);
 		}
- else {
+		else {
 			this._poly.setLatLngs(latlngs);
 		}
 
@@ -1058,18 +1060,13 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 
 	// Programmatic way to draw a filter circle
 	setFilter: function(filter) {
+		// Set startLatLng so edits remember the starting point
 		this._startLatLng = filter.center;
 
-		// Render the circle
-		if (!this._shape) {
-			this._shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
-			this._map.addLayer(this._shape);
-		}
-		else {
-			this._shape.setLatLng(filter.center).setRadius(filter.radius);
-		}
+		// We don't need to add the circle since it's only added while editing. In this case, we just create a shape and return it
+		var shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
 
-		return { type: 'circle', 'layer': this._shape };
+		return { type: 'circle', 'layer': shape };
 	},
 
 	equals: function(shape1, shape2) {
@@ -1163,19 +1160,10 @@ L.Filter.Rectangle = L.Filter.SimpleShape.extend({
 
 	// Programmatic way to draw a filter rectangle (bit of a hack)
 	setFilter: function(filter) {
-		this.enable();
-
-		// init
-		this._isDrawing = true;
 		this._startLatLng = filter.northEast;
 
-		// Update
-		var shape = this._drawShape(filter.southWest);
-
-		// Finish
-		this.disable();
-
-		return shape;
+		var shape = new L.Rectangle(new L.LatLngBounds(this._startLatLng, filter.southWest), this.options.shapeOptions);
+		return { type: 'rectangle', 'layer': shape };
 	},
 
 	equals: function(shape1, shape2) {
@@ -1329,18 +1317,21 @@ L.Control.Filter = L.Control.extend({
 	// Public method to programatically set the state of the filter
 	setFilter: function(filter) {
 		// Check to see if a change is being applied
-		var shape1 = (null != this._filterState)? this._getGeo(this._filterState.type, this._filterState.shape) : undefined;
+		var shape = (null != this._filterState)?
+			this._getGeo(this._filterState.type, this._filterState.shape)
+			: undefined;
+
 		// If there is no change, then we're just going to short circuit out of here
-		if(this._toolbar.equals(shape1, filter)) {
+		if(this._toolbar.equals(shape, filter)) {
 			return;
 		}
 
 		if(null != filter) {
-			// Ask the handler for the filter object
-			var filterObject = this._toolbar.setFilter(filter);
-
 			// Clear the old filter
 			this._clearFilter(true);
+
+			// Ask the handler for the filter object
+			var filterObject = this._toolbar.setFilter(filter);
 
 			// Create the new filter
 			this._createFilter(filterObject);
@@ -1533,7 +1524,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 			this._modes.clear.handler.unlock();
 
 		}
- else {
+		else {
 			for(type in this._modes) {
 				// The two draw buttons are enabled when there are no filters
 				L.DomUtil.removeClass(this._modes[type].button, 'leaflet-disabled');
@@ -1552,7 +1543,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		if(null != this._modes[filter.type]) {
 			return this._modes[filter.type].handler.setFilter(filter);
 		}
- else {
+		else {
 			console.error('Unsupported filter type: ' + filter.type);
 		}
 	},
@@ -1572,7 +1563,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		if(shape1 == null && shape2 == null) {
 			return true;
 		}
- else if(shape1 == null || shape2 == null) {
+		else if(shape1 == null || shape2 == null) {
 			return false;
 		}
 
