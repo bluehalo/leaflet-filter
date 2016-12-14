@@ -47,7 +47,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 		// We don't need to add the circle since it's only added while editing. In this case, we just create a shape and return it
 		var shape = new L.Circle(filter.center, filter.radius, this.options.shapeOptions);
 
-		return { type: 'circle', 'layer': shape };
+		return { type: 'circle', layer: shape };
 	},
 
 	equals: function(shape1, shape2) {

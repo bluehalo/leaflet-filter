@@ -174,6 +174,7 @@ Users can interact directly with the controls to create and manipulate the state
 
 #### setFilter(shape)
 
+
 ```js
 // Circle shape
 control.setFilter({
@@ -207,29 +208,17 @@ control.setFilter({
 
 #### Events
 Register for filter state events on the map object.
-
+* **filter:filter** A filter has been applied. The event object contains a ```geo``` field that has the geometry of the filter. This is meant to the be primary event, which fires when filters are created, modified, or removed.
 * **filter:filterstart** A filter action has started. This could be when a user has activated one of the filter drawing tools or when a filter is programmtically applied.
-* **filter:filter** A filter has been applied. The event object contains a ```geo``` field that has the geometry of the filter.
 * **filter:filterstop** A filter action has stopped. This is when the drawing activity is complete.
 * **filter:cleared** A filter has been cleared using the delete button or by programmatically setting the filter to null.
+* **filter:created** A filter has been created.
 
 Examples:
 ```js
 map.on('filter:filter', function (e) {
 	// e.geo contains the actual geometry of the filter
 	console.log({ type: 'filter:filter', event: e });
-});
-
-map.on('filter:clear', function (e) {
-	console.log({ type: 'filter:clear', event: e });
-});
-
-map.on('filter:filterstart', function (e) {
-	console.log({ type: 'filter:filterstart', event: e });
-});
-
-map.on('filter:filterstop', function (e) {
-	console.log({ type: 'filter:filterstop', event: e });
 });
 ```
 
