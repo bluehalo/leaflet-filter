@@ -52,7 +52,19 @@
 		control.addTo(map);
 
 		map.on('filter:filter', function (e) {
-			console.log(e);
+			console.log({ type: 'filter:filter', event: e });
+		});
+
+		map.on('filter:clear', function (e) {
+			console.log({ type: 'filter:clear', event: e });
+		});
+
+		map.on('filter:filterstart', function (e) {
+			console.log({ type: 'filter:filterstart', event: e });
+		});
+
+		map.on('filter:filterstop', function (e) {
+			console.log({ type: 'filter:filterstop', event: e });
 		});
 
 		function createRectangleFn(){
