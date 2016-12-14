@@ -598,6 +598,12 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 		this._isDrawing = false;
 	},
 
+	disable: function () {
+		L.Filter.Feature.prototype.disable.call(this);
+		this._clearMouseMarker();
+		this._clearGuides();
+	},
+
 	_getTooltipText: function () {
 		return {
 			text: this._endLabelText
@@ -1541,7 +1547,14 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 
 	setFilter: function(filter) {
 		if(null != this._modes[filter.type]) {
-			return this._modes[filter.type].handler.setFilter(filter);
+			var handler = this._modes[filter.type].handler;
+
+			handler.enable();
+			this.setFiltered(null != filter);
+			var toReturn = handler.setFilter(filter);
+			handler.disable();
+
+			return toReturn;
 		}
 		else {
 			console.error('Unsupported filter type: ' + filter.type);

@@ -121,6 +121,12 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 		this._isDrawing = false;
 	},
 
+	disable: function () {
+		L.Filter.Feature.prototype.disable.call(this);
+		this._clearMouseMarker();
+		this._clearGuides();
+	},
+
 	_getTooltipText: function () {
 		return {
 			text: this._endLabelText
