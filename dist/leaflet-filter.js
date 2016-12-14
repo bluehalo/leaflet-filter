@@ -16,7 +16,7 @@ L.filterLocal = {
 			buttons: {
 				rectangle: 'Draw a bounding box filter',
 				polygon: 'Draw a bounding polygon filter',
-				polyline: 'Draw a multipoint line',
+				polyline: '',
 				circle: 'Draw a bounding circle filter',
 				disabled: 'Filter already applied',
 				clear: 'Clear current filter',
@@ -36,12 +36,16 @@ L.filterLocal = {
 			},
 			polyline: {
 				tooltip: {
-					start: 'Click to draw multiple points.'
+					start: '',
+					cont: '',
+					end: ''
 				}
 			},
 			polygon: {
 				tooltip: {
-					start: 'Click to draw polygon points.'
+					start: 'Click to start drawing shape.',
+					cont: 'Click to continue drawing shape.',
+					end: 'Click first point to close this shape.'
 				}
 			},
 			circle: {
@@ -895,8 +899,11 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 	initialize: function (map, options) {
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Filter.Polygon.TYPE;
-		this._initialLabelText = L.filterLocal.filter.handlers.polygon.tooltip.start;
+
 		L.Filter.Polyline.prototype.initialize.call(this, map, options);
+
+		this._initialLabelText = L.filterLocal.filter.handlers.polygon.tooltip.start;
+		this._endLabelText = L.filterLocal.filter.handlers.polygon.tooltip.end;
 	},
 
 	// Programmatic way to draw a filter rectangle (bit of a hack)
@@ -1102,12 +1109,19 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 	},
 
 	_getTooltipText: function () {
-		var tooltipText = L.Filter.SimpleShape.prototype._getTooltipText.call(this),
-			shape = this._shape,
-			latLngs, area, subtext;
+		var tooltipText = L.Filter.SimpleShape.prototype._getTooltipText.call(this);
+		var shape = this._shape;
+		var latLngs, bounds, area, subtext;
 
 		if (shape) {
-			latLngs = this._shape.getBounds();
+			bounds = this._shape.getBounds();
+			latLngs = [
+				bounds.getNorthWest(),
+				bounds.getNorthEast(),
+				bounds.getSouthEast(),
+				bounds.getSouthWest()
+			];
+
 			area = L.GeometryUtil.geodesicArea(latLngs) / 4 * Math.PI;
 			subtext = L.GeometryUtil.readableArea(area, this.options.metric);
 		}
@@ -1201,13 +1215,20 @@ L.Filter.Rectangle = L.Filter.SimpleShape.extend({
 	},
 
 	_getTooltipText: function () {
-		var tooltipText = L.Filter.SimpleShape.prototype._getTooltipText.call(this),
-			shape = this._shape,
-			latLngs, area, subtext;
+		var tooltipText = L.Filter.SimpleShape.prototype._getTooltipText.call(this);
+		var shape = this._shape;
+		var latLngs, bounds, area, subtext;
 
 		if (shape) {
-			latLngs = this._shape.getLatLngs();
-			area = L.GeometryUtil.geodesicArea(latLngs);
+			bounds = this._shape.getBounds();
+			latLngs = [
+				bounds.getNorthWest(),
+				bounds.getNorthEast(),
+				bounds.getSouthEast(),
+				bounds.getSouthWest()
+			];
+
+			area = L.GeometryUtil.geodesicArea(latLngs) / 4 * Math.PI;
 			subtext = L.GeometryUtil.readableArea(area, this.options.metric);
 		}
 

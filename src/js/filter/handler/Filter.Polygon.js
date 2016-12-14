@@ -26,8 +26,11 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 	initialize: function (map, options) {
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Filter.Polygon.TYPE;
-		this._initialLabelText = L.filterLocal.filter.handlers.polygon.tooltip.start;
+
 		L.Filter.Polyline.prototype.initialize.call(this, map, options);
+
+		this._initialLabelText = L.filterLocal.filter.handlers.polygon.tooltip.start;
+		this._endLabelText = L.filterLocal.filter.handlers.polygon.tooltip.end;
 	},
 
 	// Programmatic way to draw a filter rectangle (bit of a hack)
