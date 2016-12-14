@@ -12,6 +12,7 @@
 - [API](#api)
 - [Contribute](#contribute)
 - [License](#license)
+- [Credits](#credits)
 
 
 ## Install 
@@ -240,40 +241,11 @@ PRs accepted. If you are part of Asymmetrik, please make contributions on featur
 ## License
 See LICENSE in repository for details.
 
-
-## How do I use it?
-
-
-If you would like to use this plugin with the [Angular Leaflet Directive](https://github.com/tombatossals/angular-leaflet-directive), use the [Angular Directive Extension project](https://github.com/Asymmetrik/angular-leaflet-directive-ext)
-
-## How do I include this plugin in my project?
-The easiest way to include this plugin in your project, use [Bower](http://bower.io)
-
-```bash
-bower install -S leaflet-filter
-```
-
-Alternatively, you can download the source or minified javascript files yourself from the GitHub repository (they are contained in the dist directory).
-
-Alter-alternatively, you can clone this repo and build it yourself.
-
-## How do I build this project?
-There are several tools you will need to install to build this project:
-* [Node](http://nodejs.org/)
-* [Gulp](http://http://gulpjs.com/)
-* [Bower](http://bower.io)
-
-If you're on Mac OS, check out [Homebrew](https://github.com/mxcl/homebrew) to get node up and running easily. It's as simple as `brew install node`
-
-First, you will need to install the build dependencies for the project using node. If you want to use the examples, you will need to install the javascript dependencies for the project using bower. Finally, to build the project and generate the artifacts in the /dist directory, you will need to build the project using gulp. 
-
-```bash
-npm install
-bower install
-gulp
-```
-
 ## Credits
+**[Leaflet](http://leafletjs.com/)** Is an awesome mapping package.
+
+**[Leaflet Draw](https://github.com/Leaflet/Leaflet.draw)** Is an awesome extension to Leaflet that lets you draw shapes all over your maps.
+
 
 
 [travis-url]: https://travis-ci.org/Asymmetrik/leaflet-filter/
