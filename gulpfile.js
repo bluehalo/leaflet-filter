@@ -1,72 +1,120 @@
-var gulp = require('gulp'),
-	p = require('./package.json'),
+'use strict';
+
+let
+	glob = require('glob'),
+	gulp = require('gulp'),
 	gulpLoadPlugins = require('gulp-load-plugins'),
-	plugins = gulpLoadPlugins();
+	path = require('path'),
+	rollup = require('rollup'),
+	runSequence = require('run-sequence'),
 
-var banner = '/*! ' + p.name + ' Version: ' + p.version + ' */\n';
+	plugins = gulpLoadPlugins(),
+	assets = require('./config/assets'),
+	pkg = require('./package.json');
 
-gulp.task('default', ['build']);
 
-gulp.task('watch', function(){
-	gulp.watch(['src/**/*', '!/src/lib/**/*'], ['build']);
+// Banner to append to generated files
+let bannerString = '/*! ' + pkg.name + '-' + pkg.version + ' - ' + pkg.copyright + '*/\n'
+
+
+/**
+ * Validation Tasks
+ */
+
+gulp.task('validate-js', () => {
+
+	return gulp.src(assets.src.js)
+
+	// ESLint
+		.pipe(plugins.eslint())
+		.pipe(plugins.eslint.format())
+		.pipe(plugins.eslint.failAfterError());
+
 });
 
-gulp.task('build', ['js', 'css'] );
 
-gulp.task('js', function(){
-	return gulp.src([
-			'src/js/FontAwesomeToolbar.js',
-			'src/js/filter/Leaflet.filter.js',
-			'src/js/filter/handler/Filter.Feature.js',
-			'src/js/filter/handler/Filter.SimpleShape.js',
-			'src/js/filter/handler/Filter.Rectangle.js',
-			'src/js/filter/handler/Filter.Polyline.js',
-			'src/js/filter/handler/Filter.Polygon.js',
-			'src/js/filter/handler/Filter.Circle.js',
-			'src/js/filter/handler/Filter.Clear.js',
-			'src/js/filter/Control.Filter.js',
-			'src/js/filter/FilterToolbar.js',
-			'src/js/**/*.js'
-		])
+/**
+ * Build
+ */
 
-		// JS Hint
-		.pipe(plugins.jshint())
-		.pipe(plugins.jshint.reporter('jshint-stylish'))
+gulp.task('build-js', ['rollup-js'], () => {
 
-		// Concatenate
-		.pipe(plugins.concat(p.name + '.js'))
-		.pipe(plugins.insert.prepend(banner))
-		.pipe(gulp.dest('dist'))
-		.pipe(plugins.filesize())
+	// Uglify
+	return gulp.src(path.join(assets.dist.dir, (pkg.artifactName + '.js')))
+		.pipe(plugins.uglify({ preserveComments: 'license' }))
+		.pipe(plugins.rename(pkg.artifactName + '.min.js'))
+		.pipe(gulp.dest(assets.dist.dir));
 
-		// Uglify
-		.pipe(plugins.uglify())
-		.pipe(plugins.rename(p.name + '.min.js'))
-		.pipe(plugins.insert.prepend(banner))
-		.pipe(gulp.dest('dist'))
-		.pipe(plugins.filesize())
-		.on('error', plugins.util.log);
 });
 
-gulp.task('css', function(){
-	return gulp.src('src/css/**/*.css')
+gulp.task('rollup-js', () => {
+	return rollup.rollup({
+		entry: assets.src.entry
+	})
+		.then((bundle) => {
+			return bundle.write({
+				dest: path.join(assets.dist.dir, (pkg.artifactName + '.js')),
+				format: 'umd',
+				moduleName: 'leafletD3',
+				sourceMap: true,
+				banner: bannerString
+			});
+		});
 
-		// CSS
-		.pipe(plugins.csslint('.csslintrc'))
-		.pipe(plugins.csslint.reporter('jshint-stylish'))
-
-		// Concatenate
-		.pipe(plugins.concat(p.name + '.css'))
-		.pipe(plugins.insert.prepend('@import url("icons/filter.css");'))
-		.pipe(plugins.insert.prepend(banner))
-		.pipe(gulp.dest('dist'))
-		.pipe(plugins.filesize())
-
-		// Uglify
-		.pipe(plugins.minifyCss())
-		.pipe(plugins.rename(p.name + '.min.css'))
-		.pipe(plugins.insert.prepend(banner))
-		.pipe(gulp.dest('dist'))
-		.pipe(plugins.filesize())
-		.on('error', plugins.util.log);
 });
+
+
+gulp.task('build-css', () => {
+
+	// Generate a list of the sources in a deterministic manner
+	let sourceArr = [];
+	assets.src.sass.forEach((f) => {
+		sourceArr = sourceArr.concat(glob.sync(f).sort());
+	});
+
+	return gulp.src(sourceArr)
+
+		// Lint the Sass
+		.pipe(plugins.sassLint({
+			formatter: 'stylish',
+			rules: require('./config/sasslint.conf.js')
+		}))
+		.pipe(plugins.sassLint.format())
+		.pipe(plugins.sassLint.failOnError())
+
+		// Compile and concat the sass (w/sourcemaps)
+		.pipe(plugins.sourcemaps.init())
+		.pipe(plugins.sass())
+		.pipe(plugins.concat(pkg.artifactName + '.css'))
+		.pipe(plugins.insert.prepend(bannerString))
+		.pipe(plugins.sourcemaps.write('.'))
+		.pipe(gulp.dest(assets.dist.dir))
+
+		// Clean the CSS
+		.pipe(plugins.filter(path.join(assets.dist.dir, (pkg.artifactName + '.css'))))
+		.pipe(plugins.cleanCss())
+		.pipe(plugins.rename(pkg.artifactName + '.min.css'))
+		.pipe(gulp.dest(assets.dist.dir));
+
+});
+
+gulp.task('copy-fonts', () => {
+	return gulp.src(assets.src.fonts.dir, { base: assets.src.fonts.base })
+		.pipe(gulp.dest(assets.dist.dir));
+});
+
+gulp.task('watch', [ 'build' ], () => {
+	gulp.watch([ assets.src.js, assets.src.sass ], [ 'build' ]);
+});
+
+
+/**
+ * --------------------------
+ * Main Tasks
+ * --------------------------
+ */
+
+gulp.task('build', (done) => { runSequence('validate-js', [ 'build-js', 'build-css', 'copy-fonts' ], done); } );
+
+// Default task builds and tests
+gulp.task('default', [ 'build' ]);
