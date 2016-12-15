@@ -1,4 +1,4 @@
-/*! @asymmetrik/leaflet-filter-1.0.3 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter-1.0.4 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
 @font-face {
   font-family: 'filter';
   font-style: normal;
@@ -8,7 +8,7 @@
 @media screen {
   @font-face {
     font-family: 'filter';
-    src: url("../fonts/filter_de356ac816c37844619223686e4eb1f2.svg#filter") format("svg"); } }
+    src: url("./fonts/filter_de356ac816c37844619223686e4eb1f2.svg#filter") format("svg"); } }
 
 [data-icon]::before {
   content: attr(data-icon); }
@@ -45,7 +45,7 @@
 @media screen {
   @font-face {
     font-family: 'filter';
-    src: url("../fonts/filter_de356ac816c37844619223686e4eb1f2.svg#filter") format("svg"); } }
+    src: url("./fonts/filter_de356ac816c37844619223686e4eb1f2.svg#filter") format("svg"); } }
 
 [data-icon]::before {
   content: attr(data-icon); }
