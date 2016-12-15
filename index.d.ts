@@ -3,30 +3,30 @@
 
 declare namespace L {
 
-	namespace control {
+	namespace Control {
 
 		/**
 		 * Circle-based filter.
 		 * type is 'circle'
 		 */
-		interface IFilterCircle extends L.Circle {}
+		interface FilterCircle extends L.Circle {}
 
 		/**
 		 * Rectangle-based filter
 		 * type is 'rectangle'
 		 */
-		interface IFilterRectangle extends L.Rectangle {}
+		interface FilterRectangle extends L.Rectangle {}
 
 		/**
 		 * Plygon-based filter, requires at least three points. Doesn't need to be closed.
 		 * type is 'polygon'
 		 */
-		interface IFilterPolygon extends L.Polygon {}
+		interface FilterPolygon extends L.Polygon {}
 
 		/**
 		 * Filter control. Main point of interaction with the filter mechanism.
 		 */
-		interface IFilterControl {
+		interface FilterControl extends L.Control {
 			/**
 			 * Clear the filter
 			 */
@@ -34,28 +34,33 @@ declare namespace L {
 
 			/**
 			 * Set a circle-based filter
-			 * @param IFilterCircle
+			 * @param FilterCircle
 			 */
-			setFilter(IFilterCircle): void;
+			setFilter(filter: FilterCircle): void;
 
 			/**
 			 * Set a rectangle-based filter
-			 * @param IFilterRectangle
+			 * @param FilterRectangle
 			 */
-			setFilter(IFilterRectangle): void;
+			setFilter(filter: FilterRectangle): void;
 
 			/**
 			 * Set a polygon-based filter
-			 * @param IFilterPolygon
+			 * @param FilterPolygon
 			 */
-			setFilter(IFilterPolygon): void;
+			setFilter(filter: FilterPolygon): void;
 
+			/**
+			 * Add the control to the map
+			 * @param map The map to which to add the control
+			 */
+			addTo(map: L.Map): this;
 		}
 
 		/**
 		 * Options that determine how the filtering mechanism behaves
 		 */
-		interface IFilterOptions {
+		interface FilterOptions {
 
 			/**
 			 * Configuration for circle filters. Omit to disable.
@@ -76,7 +81,7 @@ declare namespace L {
 		/**
 		 * Options that determine how the filter control appears and behaves
 		 */
-		interface IFilterControlOptions {
+		interface FilterControlOptions {
 			/**
 			 * Map position for the control. Defaults to 'topright'
 			 * 'topleft', 'topright', 'bottomleft', 'bottomright'
@@ -87,22 +92,23 @@ declare namespace L {
 			 * Options for determining how the filter controls will behave and which are enabled.
 			 * Default behavior is to allow all filter control types.
 			 */
-			filter?: IFilterOptions,
+			filter?: FilterOptions,
 
 			/**
 			 * The layer in which to store the filter shapes
 			 */
-			featureGroup: L.Layer
+			featureGroup: L.FeatureGroup
 
 		}
 
-		/**
-		 * Create a filter control
-		 * @param IFilterControlOptions
-		 */
-		export function filter(IFilterControlOptions) : IFilterControl;
-
 	}
 
+	namespace control {
+		/**
+		 * Create a filter control
+		 * @param FilterControlOptions
+		 */
+		function filter(options: L.Control.FilterControlOptions) : L.Control.FilterControl;
+	}
 
 }
