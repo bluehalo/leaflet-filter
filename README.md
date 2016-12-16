@@ -16,8 +16,10 @@
 
 
 ## Install 
-Install the package via npm:
+Install the package and its peer dependencies via npm:
 ```
+npm install leaflet
+npm install leaflet-draw
 npm install @asymmetrik/leaflet-filter
 ```
 
@@ -230,11 +232,10 @@ PRs accepted. If you are part of Asymmetrik, please make contributions on featur
 ## License
 See LICENSE in repository for details.
 
+
 ## Credits
 **[Leaflet](http://leafletjs.com/)** Is an awesome mapping package.
-
 **[Leaflet Draw](https://github.com/Leaflet/Leaflet.draw)** Is an awesome extension to Leaflet that lets you draw shapes all over your maps.
-
 
 
 [travis-url]: https://travis-ci.org/Asymmetrik/leaflet-filter/
