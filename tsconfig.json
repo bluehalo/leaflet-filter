@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+
+		"noImplicitAny": true,
+		"suppressImplicitAnyIndexErrors": true
+
+	},
+	
+	"files": [
+		"index.d.ts",
+		"./node_modules/@types/leaflet/index.d.ts",
+		"./node_modules/@types/leaflet-draw/index.d.ts"
+	]
+}

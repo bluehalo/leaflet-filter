@@ -6,7 +6,7 @@ declare namespace L {
 	namespace Control {
 
 		/**
-		 * Circle-based filter.
+		 * Circle-based filter
 		 * type is 'circle'
 		 */
 		interface FilterCircle extends L.Circle {}
@@ -65,17 +65,17 @@ declare namespace L {
 			/**
 			 * Configuration for circle filters. Omit to disable.
 			 */
-			circle?: DrawOptions.CircleOptions,
+			circle?: L.DrawOptions.CircleOptions,
 
 			/**
 			 * Configuration for rectangle filters. Omit to disable.
 			 */
-			rectangle?: DrawOptions.RectangleOptions,
+			rectangle?: L.DrawOptions.RectangleOptions,
 
 			/**
 			 * Configuration for polygon filters. Omit to disable.
 			 */
-			polygon?: DrawOptions.PolygonOptions
+			polygon?: L.DrawOptions.PolygonOptions
 		}
 
 		/**
