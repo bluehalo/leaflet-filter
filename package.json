@@ -2,7 +2,7 @@
 	"name": "@asymmetrik/leaflet-filter",
 	"artifactName": "leaflet-filter",
 	"description": "Extension of Leaflet.Draw that limits you to only drawing a single shape",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"author": "Asymmetrik, Ltd.",
 	"copyright": "Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.",
 	"license": "MIT",
