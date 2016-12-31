@@ -30,16 +30,14 @@ L.FontAwesomeToolbar = L.Class.extend({
 		this._map = map;
 
 		for (i = 0; i < modeHandlers.length; i++) {
-			if (modeHandlers[i].enabled) {
-				this._initModeHandler(
-					modeHandlers[i].handler,
-					this._toolbarContainer,
-					buttonIndex++,
-					buttonClassPrefix,
-					modeHandlers[i].title,
-					modeHandlers[i].icon
-				);
-			}
+			this._initModeHandler(
+				modeHandlers[i].handler,
+				this._toolbarContainer,
+				(modeHandlers[i].enabled)? buttonIndex++ : -1,
+				buttonClassPrefix,
+				modeHandlers[i].title,
+				modeHandlers[i].icon
+			);
 		}
 
 		// if no buttons were added, do not add the toolbar
@@ -58,6 +56,10 @@ L.FontAwesomeToolbar = L.Class.extend({
 		container.appendChild(this._actionsContainer);
 
 		return container;
+	},
+
+	getModeHandlers: function(map) {
+		return [];
 	},
 
 	removeToolbar: function () {
@@ -101,16 +103,19 @@ L.FontAwesomeToolbar = L.Class.extend({
 
 		this._modes[type].handler = handler;
 
-		this._modes[type].button = this._createButton({
-			title: buttonTitle,
-			icon: buttonIcon,
-			className: classNamePrefix + '-' + type,
-			container: container,
-			callback: this._modes[type].handler.enable,
-			context: this._modes[type].handler
-		});
+		// a button index of -1 means the button is disabled
+		if(-1 !== buttonIndex) {
+			this._modes[type].button = this._createButton({
+				title: buttonTitle,
+				icon: buttonIcon,
+				className: classNamePrefix + '-' + type,
+				container: container,
+				callback: this._modes[type].handler.enable,
+				context: this._modes[type].handler
+			});
 
-		this._modes[type].buttonIndex = buttonIndex;
+			this._modes[type].buttonIndex = buttonIndex;
+		}
 
 		this._modes[type].handler
 			.on('enabled', this._handlerActivated, this)
@@ -159,9 +164,10 @@ L.FontAwesomeToolbar = L.Class.extend({
 		// Cache new active feature
 		this._activeMode = this._modes[e.handler];
 
-		L.DomUtil.addClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
-
-		this._showActionsToolbar();
+		if(null != this._activeMode.button) {
+			L.DomUtil.addClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
+			this._showActionsToolbar();
+		}
 
 		this.fire('enable');
 	},
@@ -169,7 +175,9 @@ L.FontAwesomeToolbar = L.Class.extend({
 	_handlerDeactivated: function () {
 		this._hideActionsToolbar();
 
-		L.DomUtil.removeClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
+		if(null != this._activeMode.button) {
+			L.DomUtil.removeClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
+		}
 
 		this._activeMode = null;
 
@@ -182,7 +190,7 @@ L.FontAwesomeToolbar = L.Class.extend({
 			l = buttons.length,
 			li, di, dl, button;
 
-		// Dispose the actions toolbar (todo: dispose only not used buttons)
+		// Dispose the actions toolbar
 		for (di = 0, dl = this._actionButtons.length; di < dl; di++) {
 			this._disposeButton(this._actionButtons[di].button, this._actionButtons[di].callback);
 		}

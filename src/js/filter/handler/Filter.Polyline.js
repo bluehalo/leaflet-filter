@@ -9,7 +9,8 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 	Poly: L.Polyline,
 
 	options: {
-		allowIntersection: true,
+		enabled: true,
+		allowIntersection: false,
 		repeatMode: false,
 		drawError: {
 			color: '#b00b00',

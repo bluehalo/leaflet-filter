@@ -88,6 +88,16 @@ L.Control.Filter = L.Control.extend({
 		}
 	},
 
+	/**
+	 * Programatically set the filtered state of the toolbar. This should only be
+	 * used if you want to override the behavior of the control. All this will do
+	 * is change the enabled state of the various controls. It will not change the
+	 * filter state.
+	 */
+	setFiltered: function(filtered) {
+		this._toolbar.setFiltered(filtered);
+	},
+
 	_createFilter: function(filter, suppressEvent) {
 		//Add the created shape to the filter group
 		this.options.featureGroup.addLayer(filter.layer);

@@ -8,6 +8,7 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 	Poly: L.Polygon,
 
 	options: {
+		enabled: true,
 		showArea: false,
 		shapeOptions: {
 			stroke: true,

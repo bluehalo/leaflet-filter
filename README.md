@@ -124,6 +124,14 @@ var options = {
 var control = L.control.filter(options);
 ```
 
+To disable a control, omit it from the options.filter object.
+Or, include it but set a property 'enabled' to false.
+
+The reason for this feature is that if you disable a filter type, it really only eliminates the filter button for that filter type.
+You can still programmatically set the filter and the shape will show up on the map.
+This is useful if you want to have your own external source of filter types that you don't want to let the user manipulate.
+
+
 #### featureGroup (required)
 You must provide a featureGroup layer to the plugin. This is the layer in which the plugin will place all drawn filter shapes. You must add the feature group to the map yourself.
 
