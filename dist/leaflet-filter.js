@@ -1,4 +1,4 @@
-/*! @asymmetrik/leaflet-filter-1.0.7 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter-1.0.8 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -89,16 +89,14 @@ L.FontAwesomeToolbar = L.Class.extend({
 		this._map = map;
 
 		for (i = 0; i < modeHandlers.length; i++) {
-			if (modeHandlers[i].enabled) {
-				this._initModeHandler(
-					modeHandlers[i].handler,
-					this._toolbarContainer,
-					buttonIndex++,
-					buttonClassPrefix,
-					modeHandlers[i].title,
-					modeHandlers[i].icon
-				);
-			}
+			this._initModeHandler(
+				modeHandlers[i].handler,
+				this._toolbarContainer,
+				(modeHandlers[i].enabled)? buttonIndex++ : -1,
+				buttonClassPrefix,
+				modeHandlers[i].title,
+				modeHandlers[i].icon
+			);
 		}
 
 		// if no buttons were added, do not add the toolbar
@@ -117,6 +115,10 @@ L.FontAwesomeToolbar = L.Class.extend({
 		container.appendChild(this._actionsContainer);
 
 		return container;
+	},
+
+	getModeHandlers: function(map) {
+		return [];
 	},
 
 	removeToolbar: function () {
@@ -160,16 +162,19 @@ L.FontAwesomeToolbar = L.Class.extend({
 
 		this._modes[type].handler = handler;
 
-		this._modes[type].button = this._createButton({
-			title: buttonTitle,
-			icon: buttonIcon,
-			className: classNamePrefix + '-' + type,
-			container: container,
-			callback: this._modes[type].handler.enable,
-			context: this._modes[type].handler
-		});
+		// a button index of -1 means the button is disabled
+		if(-1 !== buttonIndex) {
+			this._modes[type].button = this._createButton({
+				title: buttonTitle,
+				icon: buttonIcon,
+				className: classNamePrefix + '-' + type,
+				container: container,
+				callback: this._modes[type].handler.enable,
+				context: this._modes[type].handler
+			});
 
-		this._modes[type].buttonIndex = buttonIndex;
+			this._modes[type].buttonIndex = buttonIndex;
+		}
 
 		this._modes[type].handler
 			.on('enabled', this._handlerActivated, this)
@@ -218,9 +223,10 @@ L.FontAwesomeToolbar = L.Class.extend({
 		// Cache new active feature
 		this._activeMode = this._modes[e.handler];
 
-		L.DomUtil.addClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
-
-		this._showActionsToolbar();
+		if(null != this._activeMode.button) {
+			L.DomUtil.addClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
+			this._showActionsToolbar();
+		}
 
 		this.fire('enable');
 	},
@@ -228,7 +234,9 @@ L.FontAwesomeToolbar = L.Class.extend({
 	_handlerDeactivated: function () {
 		this._hideActionsToolbar();
 
-		L.DomUtil.removeClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
+		if(null != this._activeMode.button) {
+			L.DomUtil.removeClass(this._activeMode.button, 'leaflet-draw-toolbar-button-enabled');
+		}
 
 		this._activeMode = null;
 
@@ -241,7 +249,7 @@ L.FontAwesomeToolbar = L.Class.extend({
 			l = buttons.length,
 			li, di, dl, button;
 
-		// Dispose the actions toolbar (todo: dispose only not used buttons)
+		// Dispose the actions toolbar
 		for (di = 0, dl = this._actionButtons.length; di < dl; di++) {
 			this._disposeButton(this._actionButtons[di].button, this._actionButtons[di].callback);
 		}
@@ -490,7 +498,8 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 	Poly: L.Polyline,
 
 	options: {
-		allowIntersection: true,
+		enabled: true,
+		allowIntersection: false,
 		repeatMode: false,
 		drawError: {
 			color: '#b00b00',
@@ -881,6 +890,7 @@ L.Filter.Polygon = L.Filter.Polyline.extend({
 	Poly: L.Polygon,
 
 	options: {
+		enabled: true,
 		showArea: false,
 		shapeOptions: {
 			stroke: true,
@@ -1038,6 +1048,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 	},
 
 	options: {
+		enabled: true,
 		shapeOptions: {
 			stroke: true,
 			color: '#f06eaa',
@@ -1142,6 +1153,7 @@ L.Filter.Rectangle = L.Filter.SimpleShape.extend({
 	},
 
 	options: {
+		enabled: true,
 		shapeOptions: {
 			stroke: true,
 			color: '#f06eaa',
@@ -1368,6 +1380,16 @@ L.Control.Filter = L.Control.extend({
 		}
 	},
 
+	/**
+	 * Programatically set the filtered state of the toolbar. This should only be
+	 * used if you want to override the behavior of the control. All this will do
+	 * is change the enabled state of the various controls. It will not change the
+	 * filter state.
+	 */
+	setFiltered: function(filtered) {
+		this._toolbar.setFiltered(filtered);
+	},
+
 	_createFilter: function(filter, suppressEvent) {
 		//Add the created shape to the filter group
 		this.options.featureGroup.addLayer(filter.layer);
@@ -1472,7 +1494,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		var handlers = [];
 		if(null != L.Filter.Rectangle) {
 			handlers.push({
-				enabled: this.options.rectangle,
+				enabled: this._isEnabled(this.options.rectangle),
 				handler: new L.Filter.Rectangle(map, this.options.rectangle),
 				title: L.filterLocal.filter.toolbar.buttons.rectangle,
 				icon: 'fa icon-square'
@@ -1480,7 +1502,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		}
 		if(null != L.Filter.Polygon) {
 			handlers.push({
-				enabled: this.options.polygon,
+				enabled: this._isEnabled(this.options.polygon),
 				handler: new L.Filter.Polygon(map, this.options.polygon),
 				title: L.filterLocal.filter.toolbar.buttons.polygon,
 				icon: 'fa icon-hex'
@@ -1488,7 +1510,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		}
 		if(null != L.Filter.Circle) {
 			handlers.push({
-				enabled: this.options.circle,
+				enabled: this._isEnabled(this.options.circle),
 				handler: new L.Filter.Circle(map, this.options.circle),
 				title: L.filterLocal.filter.toolbar.buttons.circle,
 				icon: 'fa fa-circle-o'
@@ -1535,13 +1557,16 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 	},
 
 	setFiltered: function(filtered) {
-		var type;
+		var type, button;
 
 		if(filtered) {
 			for(type in this._modes) {
 				// The two draw buttons are disabled when we are filtered
-				L.DomUtil.addClass(this._modes[type].button, 'leaflet-disabled');
-				this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons.disabled);
+				button = this._modes[type].button;
+				if(null != button) {
+					L.DomUtil.addClass(this._modes[type].button, 'leaflet-disabled');
+					this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons.disabled);
+				}
 				this._modes[type].handler.lock();
 			}
 
@@ -1553,9 +1578,12 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		}
 		else {
 			for(type in this._modes) {
-				// The two draw buttons are enabled when there are no filters
-				L.DomUtil.removeClass(this._modes[type].button, 'leaflet-disabled');
-				this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons[type]);
+				button = this._modes[type].button;
+				if(null != button) {
+					// The two draw buttons are enabled when there are no filters
+					L.DomUtil.removeClass(this._modes[type].button, 'leaflet-disabled');
+					this._modes[type].button.setAttribute('title', L.filterLocal.filter.toolbar.buttons[type]);
+				}
 				this._modes[type].handler.unlock();
 			}
 
@@ -1602,6 +1630,10 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		}
 
 		return this._modes[shape1.type].handler.equals(shape1, shape2);
+	},
+
+	_isEnabled: function(options) {
+		return (null != options) && (null == options.enabled || options.enabled);
 	}
 
 });

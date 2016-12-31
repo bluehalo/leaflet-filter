@@ -6,6 +6,7 @@ L.Filter.Rectangle = L.Filter.SimpleShape.extend({
 	},
 
 	options: {
+		enabled: true,
 		shapeOptions: {
 			stroke: true,
 			color: '#f06eaa',
