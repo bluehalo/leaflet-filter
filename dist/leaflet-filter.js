@@ -1,4 +1,4 @@
-/*! @asymmetrik/leaflet-filter-1.0.8 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter-1.0.9 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -334,18 +334,25 @@ L.Filter.Feature = L.Handler.extend({
 		L.setOptions(this, options);
 	},
 
-	enable: function () {
+	enable: function (suppressEvents) {
 		if (this._enabled || this.isLocked()) { return; }
 		L.Handler.prototype.enable.call(this);
-		this.fire('enabled', { handler: this.type });
-		this._map.fire('filter:filterstart', { layerType: this.type });
+		this.fire('enabled', {handler: this.type});
+
+		if(!suppressEvents) {
+			this._map.fire('filter:filterstart', { layerType: this.type });
+		}
 	},
 
-	disable: function () {
+	disable: function (suppressEvents) {
 		if (!this._enabled) { return; }
 		L.Handler.prototype.disable.call(this);
-		this._map.fire('filter:filterstop', { layerType: this.type });
-		this.fire('disabled', { handler: this.type });
+
+		if(!suppressEvents) {
+			this._map.fire('filter:filterstop', { layerType: this.type });
+		}
+
+		this.fire('disabled', {handler: this.type});
 	},
 
 	lock: function() {
@@ -611,8 +618,8 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 		this._isDrawing = false;
 	},
 
-	disable: function () {
-		L.Filter.Feature.prototype.disable.call(this);
+	disable: function (suppressEvents) {
+		L.Filter.Feature.prototype.disable.call(this, suppressEvents);
 		this._clearMouseMarker();
 		this._clearGuides();
 	},
@@ -1354,7 +1361,11 @@ L.Control.Filter = L.Control.extend({
 	},
 
 	// Public method to programatically set the state of the filter
-	setFilter: function(filter) {
+	setFilter: function(filter, options) {
+
+		// Default the options
+		options = options || { suppressEvents: false, fitBounds: false };
+
 		// Check to see if a change is being applied
 		var shape = (null != this._filterState)?
 			this._getGeo(this._filterState.type, this._filterState.shape)
@@ -1370,14 +1381,20 @@ L.Control.Filter = L.Control.extend({
 			this._clearFilter(true);
 
 			// Ask the handler for the filter object
-			var filterObject = this._toolbar.setFilter(filter);
+			var filterObject = this._toolbar.setFilter(filter, options.suppressEvents);
 
 			// Create the new filter
-			this._createFilter(filterObject);
+			this._createFilter(filterObject, options.suppressEvents);
+			if(options.fitBounds) {
+				this._map.fitBounds(filterObject.layer.getBounds());
+			}
+
 		}
 		else {
 			this._clearFilter();
 		}
+
+		return this;
 	},
 
 	/**
@@ -1388,6 +1405,18 @@ L.Control.Filter = L.Control.extend({
 	 */
 	setFiltered: function(filtered) {
 		this._toolbar.setFiltered(filtered);
+
+		return this;
+	},
+
+	/**
+	 * Fitbounds on the currently applied filter (if cleared, does nothing)
+	 */
+	fitBounds: function(options) {
+		if(null != this._filterState) {
+			this._map.fitBounds(this.options.featureGroup.getBounds(), options);
+		}
+		return this;
 	},
 
 	_createFilter: function(filter, suppressEvent) {
@@ -1401,7 +1430,9 @@ L.Control.Filter = L.Control.extend({
 		this._filterState.shape.on('edit', this._filterUpdatedHandler, this);
 
 		// Fire the event that we've updated the filter
-		if(!suppressEvent) { this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) }); }
+		if(!suppressEvent) {
+			this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) });
+		}
 
 		// Set the filtered state on the toolbar
 		this._toolbar.setFiltered(true);
@@ -1594,14 +1625,14 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		}
 	},
 
-	setFilter: function(filter) {
+	setFilter: function(filter, suppressEvents) {
 		if(null != this._modes[filter.type]) {
 			var handler = this._modes[filter.type].handler;
 
-			handler.enable();
+			handler.enable(suppressEvents);
 			this.setFiltered(null != filter);
 			var toReturn = handler.setFilter(filter);
-			handler.disable();
+			handler.disable(suppressEvents);
 
 			return toReturn;
 		}

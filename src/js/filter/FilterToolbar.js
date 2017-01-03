@@ -129,14 +129,14 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		}
 	},
 
-	setFilter: function(filter) {
+	setFilter: function(filter, suppressEvents) {
 		if(null != this._modes[filter.type]) {
 			var handler = this._modes[filter.type].handler;
 
-			handler.enable();
+			handler.enable(suppressEvents);
 			this.setFiltered(null != filter);
 			var toReturn = handler.setFilter(filter);
-			handler.disable();
+			handler.disable(suppressEvents);
 
 			return toReturn;
 		}

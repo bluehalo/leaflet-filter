@@ -122,8 +122,8 @@ L.Filter.Polyline = L.Filter.Feature.extend({
 		this._isDrawing = false;
 	},
 
-	disable: function () {
-		L.Filter.Feature.prototype.disable.call(this);
+	disable: function (suppressEvents) {
+		L.Filter.Feature.prototype.disable.call(this, suppressEvents);
 		this._clearMouseMarker();
 		this._clearGuides();
 	},

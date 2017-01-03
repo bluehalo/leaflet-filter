@@ -62,7 +62,11 @@ L.Control.Filter = L.Control.extend({
 	},
 
 	// Public method to programatically set the state of the filter
-	setFilter: function(filter) {
+	setFilter: function(filter, options) {
+
+		// Default the options
+		options = options || { suppressEvents: false, fitBounds: false };
+
 		// Check to see if a change is being applied
 		var shape = (null != this._filterState)?
 			this._getGeo(this._filterState.type, this._filterState.shape)
@@ -78,14 +82,20 @@ L.Control.Filter = L.Control.extend({
 			this._clearFilter(true);
 
 			// Ask the handler for the filter object
-			var filterObject = this._toolbar.setFilter(filter);
+			var filterObject = this._toolbar.setFilter(filter, options.suppressEvents);
 
 			// Create the new filter
-			this._createFilter(filterObject);
+			this._createFilter(filterObject, options.suppressEvents);
+			if(options.fitBounds) {
+				this._map.fitBounds(filterObject.layer.getBounds());
+			}
+
 		}
 		else {
 			this._clearFilter();
 		}
+
+		return this;
 	},
 
 	/**
@@ -96,6 +106,18 @@ L.Control.Filter = L.Control.extend({
 	 */
 	setFiltered: function(filtered) {
 		this._toolbar.setFiltered(filtered);
+
+		return this;
+	},
+
+	/**
+	 * Fitbounds on the currently applied filter (if cleared, does nothing)
+	 */
+	fitBounds: function(options) {
+		if(null != this._filterState) {
+			this._map.fitBounds(this.options.featureGroup.getBounds(), options);
+		}
+		return this;
 	},
 
 	_createFilter: function(filter, suppressEvent) {
@@ -109,7 +131,9 @@ L.Control.Filter = L.Control.extend({
 		this._filterState.shape.on('edit', this._filterUpdatedHandler, this);
 
 		// Fire the event that we've updated the filter
-		if(!suppressEvent) { this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) }); }
+		if(!suppressEvent) {
+			this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) });
+		}
 
 		// Set the filtered state on the toolbar
 		this._toolbar.setFiltered(true);

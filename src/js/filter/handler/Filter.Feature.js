@@ -16,18 +16,25 @@ L.Filter.Feature = L.Handler.extend({
 		L.setOptions(this, options);
 	},
 
-	enable: function () {
+	enable: function (suppressEvents) {
 		if (this._enabled || this.isLocked()) { return; }
 		L.Handler.prototype.enable.call(this);
-		this.fire('enabled', { handler: this.type });
-		this._map.fire('filter:filterstart', { layerType: this.type });
+		this.fire('enabled', {handler: this.type});
+
+		if(!suppressEvents) {
+			this._map.fire('filter:filterstart', { layerType: this.type });
+		}
 	},
 
-	disable: function () {
+	disable: function (suppressEvents) {
 		if (!this._enabled) { return; }
 		L.Handler.prototype.disable.call(this);
-		this._map.fire('filter:filterstop', { layerType: this.type });
-		this.fire('disabled', { handler: this.type });
+
+		if(!suppressEvents) {
+			this._map.fire('filter:filterstop', { layerType: this.type });
+		}
+
+		this.fire('disabled', {handler: this.type});
 	},
 
 	lock: function() {

@@ -18,9 +18,15 @@
 <body>
 	<div id="map" style="height: 400px; border: 1px solid #ccc"></div>
 
-	<button onclick="createRectangleFn()">Create Random Rectangle</button>
-	<button onclick="createCircleFn()">Create Random Circle</button>
-	<button onclick="createPolygonFn()">Create Random Polygon</button>
+	<input type="checkbox" onclick="setFitBounds(this)">Fit Bounds (For Buttons Only)
+	<br/>
+	<input type="checkbox" onclick="setSuppressEvents(this)">Suppress Events (For Buttons Only)
+	<br/>
+	<button onclick="createRectangleFn()">Create Rectangle</button>
+	<button onclick="createCircleFn()">Create Circle</button>
+	<button onclick="createPolygonFn()">Create Polygon</button>
+	<br/>
+	<button onclick="fitBounds()">Zoom to Filter</button>
 	<button onclick="clearFn()">Clear Filter</button>
 
 	<script>
@@ -46,13 +52,18 @@
 				circle: {},
 				rectangle: {},
 				polygon: {
-					enabled: false,
-					shapeOptions: { editable: false }
+					enabled: false, // This will hide the polygon button
+					shapeOptions: { editable: false } // Makes any added polygons not editable
 				}
 			},
 			featureGroup: drawnItems
 		});
 		control.addTo(map);
+
+		var setFilterOptions = {
+			fitBounds: false,
+			suppressEvents: false
+		};
 
 		map.on('filter:filter', function (e) {
 			console.log({ type: 'filter:filter', event: e });
@@ -70,6 +81,14 @@
 			console.log({ type: 'filter:filterstop', event: e });
 		});
 
+		function setSuppressEvents(e) {
+			setFilterOptions.suppressEvents = e.checked;
+		}
+
+		function setFitBounds(e) {
+			setFilterOptions.fitBounds = e.checked;
+		}
+
 		function createRectangleFn(){
 			control.setFilter({
 				type: 'rectangle',
@@ -81,7 +100,7 @@
 					lat: center[0] + (Math.random()*0.3 - 1),
 					lng: center[1] + (Math.random()*0.3 - 1)
 				}
-			});
+			}, setFilterOptions);
 		}
 
 		function createCircleFn(){
@@ -89,7 +108,7 @@
 				type: 'circle',
 				center: [ center[0] + Math.random() - 0.5, center[1] + Math.random() - 0.5 ],
 				radius: 40000
-			});
+			}, setFilterOptions);
 		}
 
 		function createPolygonFn(){
@@ -102,12 +121,17 @@
 			control.setFilter({
 				type: 'polygon',
 				latlngs: latLngs
-			});
+			}, setFilterOptions);
 		}
 
 		function clearFn(){
 			control.setFilter();
 		}
+
+		function fitBounds() {
+			control.fitBounds({ padding: [ 5, 5 ] });
+		}
+
 	</script>
 </body>
 </html>
