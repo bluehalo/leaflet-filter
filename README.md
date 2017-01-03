@@ -180,10 +180,12 @@ var options = {
 ```
 
 ### Interaction
-Users can interact directly with the controls to create and manipulate the state of the filters. The creation/modification/deletion of filters is propagated using events. Filters can also be created and cleared programmatically.
+Users can interact directly with the controls to create and manipulate the state of the filters.
+The creation/modification/deletion of filters is propagated using events.
+Filters can also be created and cleared programmatically.
 
-#### setFilter(shape)
-
+#### setFilter(shape, options?)
+Set the filter to the provided state.
 
 ```js
 // Circle shape
@@ -215,6 +217,27 @@ control.setFilter({
 	]
 });
 ```
+
+```js
+control.setFilter({
+	type: 'rectangle',
+	northEast: { lat: 39, lng: -76 },
+	southWest: { lat: 38, lng: -77 }
+}, {
+	suppressEvents: true, // Will not emit any events when filter applied
+	fitBounds: true // Will zoom to the feature when filter applied
+});
+```
+
+#### fitBounds(options) 
+Zoom/pan to the current filter state.
+
+```js
+control.fitBounds({
+	padding: [ 5, 5 ]
+});
+```
+
 
 #### Events
 Register for filter state events on the map object.

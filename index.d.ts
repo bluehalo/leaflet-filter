@@ -30,31 +30,49 @@ declare namespace L {
 			/**
 			 * Clear the filter
 			 */
-			setFilter(): void;
+			setFilter(): this;
 
 			/**
-			 * Set a circle-based filter
-			 * @param FilterCircle
+			 * * Set a circle-based filter
+			 * @param filter
+			 * @param options
 			 */
-			setFilter(filter: FilterCircle): void;
+			setFilter(filter: FilterCircle, options?: SetFilterOptions): this;
 
 			/**
 			 * Set a rectangle-based filter
-			 * @param FilterRectangle
+			 * @param filter
+			 * @param options
 			 */
-			setFilter(filter: FilterRectangle): void;
+			setFilter(filter: FilterRectangle, options? : SetFilterOptions): this;
 
 			/**
 			 * Set a polygon-based filter
-			 * @param FilterPolygon
+			 * @param filter
+			 * @param options
 			 */
-			setFilter(filter: FilterPolygon): void;
+			setFilter(filter: FilterPolygon, options? : SetFilterOptions): this;
 
 			/**
-			 * Add the control to the map
-			 * @param map The map to which to add the control
+			 * Fit the current filter on the map (if it's set)
+			 * @param options
 			 */
-			addTo(map: L.Map): this;
+			fitBounds(options?: L.FitBoundsOptions) : this;
+		}
+
+		/**
+		 * Options that determine the behavior of a setFilter action
+		 */
+		interface SetFilterOptions {
+			/**
+			 * Do not fire the filter events associated with this filter being applied
+			 */
+			suppressEvents: boolean;
+
+			/**
+			 * Immediately zoom to the set filter
+			 */
+			fitBounds: boolean;
 		}
 
 		/**

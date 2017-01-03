@@ -21,6 +21,7 @@
 	<button onclick="createRectangleFn()">Create Random Rectangle</button>
 	<button onclick="createCircleFn()">Create Random Circle</button>
 	<button onclick="createPolygonFn()">Create Random Polygon</button>
+	<button onclick="fitBounds()">Zoom to Filter</button>
 	<button onclick="clearFn()">Clear Filter</button>
 
 	<script>
@@ -46,8 +47,8 @@
 				circle: {},
 				rectangle: {},
 				polygon: {
-					enabled: false,
-					shapeOptions: { editable: false }
+					enabled: false, // This will hide the polygon button
+					shapeOptions: { editable: false } // Makes any added polygons not editable
 				}
 			},
 			featureGroup: drawnItems
@@ -107,6 +108,10 @@
 
 		function clearFn(){
 			control.setFilter();
+		}
+
+		function fitBounds() {
+			control.fitBounds({ padding: [ 5, 5 ] });
 		}
 	</script>
 </body>
