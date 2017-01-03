@@ -82,7 +82,7 @@ L.Control.Filter = L.Control.extend({
 			this._clearFilter(true);
 
 			// Ask the handler for the filter object
-			var filterObject = this._toolbar.setFilter(filter);
+			var filterObject = this._toolbar.setFilter(filter, options.suppressEvents);
 
 			// Create the new filter
 			this._createFilter(filterObject, options.suppressEvents);
@@ -131,7 +131,9 @@ L.Control.Filter = L.Control.extend({
 		this._filterState.shape.on('edit', this._filterUpdatedHandler, this);
 
 		// Fire the event that we've updated the filter
-		if(!suppressEvent) { this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) }); }
+		if(!suppressEvent) {
+			this._map.fire('filter:filter', { geo : this._getGeo(filter.type, filter.layer) });
+		}
 
 		// Set the filtered state on the toolbar
 		this._toolbar.setFiltered(true);
