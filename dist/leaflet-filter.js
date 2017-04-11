@@ -1,4 +1,4 @@
-/*! @asymmetrik/leaflet-filter-1.0.9 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter-1.0.10 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
