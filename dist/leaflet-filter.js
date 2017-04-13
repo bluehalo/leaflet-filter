@@ -1,9 +1,9 @@
-/*! @asymmetrik/leaflet-filter-1.0.10 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter-1.0.11 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
 
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.leafletD3 = global.leafletD3 || {})));
+	(factory((global.leafletFilter = global.leafletFilter || {})));
 }(this, (function (exports) { 'use strict';
 
 L.filterLocal = {
