@@ -7,6 +7,8 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 	},
 
 	initialize: function (options) {
+		L.FontAwesomeToolbar.prototype.initialize.call(this, options);
+
 		/*
 		 * Override default options based on what is passed in
 		 * Set the options to be the combination of what was passed in and what is default
@@ -22,7 +24,6 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		// Set this.options to be options since we have already extended the options
 		this.options = options;
 		this._toolbarClass = 'leaflet-draw-filter';
-		L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 	},
 
 	getModeHandlers: function (map) {
@@ -87,6 +88,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 
 	addToolbar: function (map) {
 		var container = L.FontAwesomeToolbar.prototype.addToolbar.call(this, map);
+
 		this.setFiltered(false);
 		return container;
 	},

@@ -141,7 +141,13 @@ L.Control.Filter = L.Control.extend({
 
 	_clearFilter: function(suppressEvent) {
 		// Remove the filter shape
-		this.options.featureGroup.clearLayers();
+		try {
+			this.options.featureGroup.clearLayers();
+		}
+		catch (err) {
+			// suppress circle remove error
+		}
+
 		this._filterState = undefined;
 
 		// Fire the event

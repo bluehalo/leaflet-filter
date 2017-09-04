@@ -1,3 +1,5 @@
+import 'leaflet';
+
 L.Filter = (null != L.Filter) ? L.Filter : {};
 
 L.Filter.Circle = L.Filter.SimpleShape.extend({
@@ -26,6 +28,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Filter.Circle.TYPE;
 		this._initialLabelText = L.filterLocal.filter.handlers.circle.tooltip.start;
+
 		L.Filter.SimpleShape.prototype.initialize.call(this, map, options);
 	},
 
@@ -62,18 +65,29 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 	},
 
 	_drawShape: function (latlng) {
+
+		// Calculate the distance based on the version
+		var distance;
+		if (this._isVersion07x()) {
+			distance = this._startLatLng.distanceTo(latlng);
+		}
+		else {
+			distance = this._map.distance(this._startLatLng, latlng);
+		}
+
 		if (!this._shape) {
-			this._shape = new L.Circle(this._startLatLng, this._startLatLng.distanceTo(latlng), this.options.shapeOptions);
+			this._shape = new L.Circle(this._startLatLng, distance, this.options.shapeOptions);
 			this._map.addLayer(this._shape);
 		}
 		else {
-			this._shape.setRadius(this._startLatLng.distanceTo(latlng));
+			this._shape.setRadius(distance);
 		}
+
 		return { type: 'circle', layer: this._shape };
 	},
 
 	_fireCreatedEvent: function () {
-		var circle = new L.Circle(this._shape.getLatLng(), this._shape.getRadius(), this.options.shapeOptions);
+		var circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
 		L.Filter.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
 	},
 
@@ -83,7 +97,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 		var latLngs, bounds, area, subtext;
 
 		if (shape) {
-			bounds = this._shape.getBounds();
+			bounds = shape.getBounds();
 			latLngs = [
 				bounds.getNorthWest(),
 				bounds.getNorthEast(),
@@ -99,6 +113,12 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 			text: tooltipText.text,
 			subtext: subtext
 		};
+	},
+
+	_isVersion07x: function() {
+		var version = L.version.split(".");
+		//If Version is == 0.7.*
+		return parseInt(version[0], 10) === 0 && parseInt(version[1], 10) === 7;
 	}
 
 });

@@ -24,6 +24,7 @@
 
 	"globals": {
 		"console": true,
+		"require": true,
 		"window": true,
 
 		"L": true,

@@ -1,9 +1,9 @@
-/*! @asymmetrik/leaflet-filter-1.0.9 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter - 1.1.0 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved. */
 
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.leafletD3 = global.leafletD3 || {})));
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('leaflet')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'leaflet'], factory) :
+	(factory((global.leafletFilter = {})));
 }(this, (function (exports) { 'use strict';
 
 L.filterLocal = {
@@ -58,7 +58,7 @@ L.filterLocal = {
 };
 
 L.FontAwesomeToolbar = L.Class.extend({
-	includes: [ L.Mixin.Events ],
+	includes: L.Mixin.Events,
 
 	initialize: function (options) {
 		L.setOptions(this, options);
@@ -197,23 +197,31 @@ L.FontAwesomeToolbar = L.Class.extend({
 			link.title = options.title;
 		}
 
+		/* iOS does not use click events */
+		var buttonEvent = this._detectIOS() ? 'touchstart' : 'click';
+
 		L.DomEvent
 			.on(link, 'click', L.DomEvent.stopPropagation)
 			.on(link, 'mousedown', L.DomEvent.stopPropagation)
 			.on(link, 'dblclick', L.DomEvent.stopPropagation)
+			.on(link, 'touchstart', L.DomEvent.stopPropagation)
 			.on(link, 'click', L.DomEvent.preventDefault)
-			.on(link, 'click', options.callback, options.context);
+			.on(link, buttonEvent, options.callback, options.context);
 
 		return link;
 	},
 
 	_disposeButton: function (button, callback) {
+		/* iOS does not use click events */
+		var buttonEvent = this._detectIOS() ? 'touchstart' : 'click';
+
 		L.DomEvent
 			.off(button, 'click', L.DomEvent.stopPropagation)
 			.off(button, 'mousedown', L.DomEvent.stopPropagation)
 			.off(button, 'dblclick', L.DomEvent.stopPropagation)
+			.off(button, 'touchstart', L.DomEvent.stopPropagation)
 			.off(button, 'click', L.DomEvent.preventDefault)
-			.off(button, 'click', callback);
+			.off(button, buttonEvent, callback);
 	},
 
 	_handlerActivated: function (e) {
@@ -313,7 +321,13 @@ L.FontAwesomeToolbar = L.Class.extend({
 		L.DomUtil.removeClass(this._toolbarContainer, 'leaflet-draw-toolbar-nobottom');
 		L.DomUtil.removeClass(this._actionsContainer, 'leaflet-draw-actions-top');
 		L.DomUtil.removeClass(this._actionsContainer, 'leaflet-draw-actions-bottom');
+	},
+
+	_detectIOS: function () {
+		var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+		return iOS;
 	}
+
 });
 
 L.Filter = (null != L.Filter) ? L.Filter : {};
@@ -335,8 +349,12 @@ L.Filter.Feature = L.Handler.extend({
 	},
 
 	enable: function (suppressEvents) {
-		if (this._enabled || this.isLocked()) { return; }
+		if (this._enabled || this.isLocked()) {
+			return;
+		}
+
 		L.Handler.prototype.enable.call(this);
+
 		this.fire('enabled', {handler: this.type});
 
 		if(!suppressEvents) {
@@ -345,7 +363,10 @@ L.Filter.Feature = L.Handler.extend({
 	},
 
 	disable: function (suppressEvents) {
-		if (!this._enabled) { return; }
+		if (!this._enabled) {
+			return;
+		}
+
 		L.Handler.prototype.disable.call(this);
 
 		if(!suppressEvents) {
@@ -427,16 +448,19 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 
 			//TODO refactor: move cursor to styles
 			this._container.style.cursor = 'crosshair';
-			this._tooltip.updateContent({ text: this._initialLabelText });
 
 			this._map
 				.on('mousedown', this._onMouseDown, this)
-				.on('mousemove', this._onMouseMove, this);
+				.on('mousemove', this._onMouseMove, this)
+				.on('touchstart', this._onMouseDown, this)
+				.on('touchmove', this._onMouseMove, this);
 		}
 	},
 
 	removeHooks: function () {
 		L.Filter.Feature.prototype.removeHooks.call(this);
+		this._isDrawing = false;
+
 		if (this._map) {
 			if (this._mapDraggable) {
 				this._map.dragging.enable();
@@ -447,17 +471,26 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 
 			this._map
 				.off('mousedown', this._onMouseDown, this)
-				.off('mousemove', this._onMouseMove, this);
+				.off('mousemove', this._onMouseMove, this)
+				.off('touchstart', this._onMouseDown, this)
+				.off('touchmove', this._onMouseMove, this);
 
 			L.DomEvent.off(document, 'mouseup', this._onMouseUp, this);
+			L.DomEvent.off(document, 'touchend', this._onMouseUp, this);
 
 			// If the box element doesn't exist they must not have moved the mouse, so don't need to destroy/return
 			if (this._shape) {
-				this._map.removeLayer(this._shape);
+				try {
+					this._map.removeLayer(this._shape);
+				}
+				catch (err) {
+					// Suppress the error on removing circle
+				}
+
 				delete this._shape;
 			}
 		}
-		this._isDrawing = false;
+
 	},
 
 	_getTooltipText: function () {
@@ -472,6 +505,7 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 
 		L.DomEvent
 			.on(document, 'mouseup', this._onMouseUp, this)
+			.on(document, 'touchend', this._onMouseUp, this)
 			.preventDefault(e.originalEvent);
 	},
 
@@ -482,6 +516,9 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 		if (this._isDrawing) {
 			this._drawShape(latlng);
 			this._tooltip.updateContent(this._getTooltipText());
+		}
+		else {
+			this._tooltip.updateContent({ text: this._initialLabelText });
 		}
 	},
 
@@ -1075,6 +1112,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 		// Save the type so super can fire, need to do this as cannot do this.TYPE :(
 		this.type = L.Filter.Circle.TYPE;
 		this._initialLabelText = L.filterLocal.filter.handlers.circle.tooltip.start;
+
 		L.Filter.SimpleShape.prototype.initialize.call(this, map, options);
 	},
 
@@ -1111,18 +1149,29 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 	},
 
 	_drawShape: function (latlng) {
+
+		// Calculate the distance based on the version
+		var distance;
+		if (this._isVersion07x()) {
+			distance = this._startLatLng.distanceTo(latlng);
+		}
+		else {
+			distance = this._map.distance(this._startLatLng, latlng);
+		}
+
 		if (!this._shape) {
-			this._shape = new L.Circle(this._startLatLng, this._startLatLng.distanceTo(latlng), this.options.shapeOptions);
+			this._shape = new L.Circle(this._startLatLng, distance, this.options.shapeOptions);
 			this._map.addLayer(this._shape);
 		}
 		else {
-			this._shape.setRadius(this._startLatLng.distanceTo(latlng));
+			this._shape.setRadius(distance);
 		}
+
 		return { type: 'circle', layer: this._shape };
 	},
 
 	_fireCreatedEvent: function () {
-		var circle = new L.Circle(this._shape.getLatLng(), this._shape.getRadius(), this.options.shapeOptions);
+		var circle = new L.Circle(this._startLatLng, this._shape.getRadius(), this.options.shapeOptions);
 		L.Filter.SimpleShape.prototype._fireCreatedEvent.call(this, circle);
 	},
 
@@ -1132,7 +1181,7 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 		var latLngs, bounds, area, subtext;
 
 		if (shape) {
-			bounds = this._shape.getBounds();
+			bounds = shape.getBounds();
 			latLngs = [
 				bounds.getNorthWest(),
 				bounds.getNorthEast(),
@@ -1148,6 +1197,12 @@ L.Filter.Circle = L.Filter.SimpleShape.extend({
 			text: tooltipText.text,
 			subtext: subtext
 		};
+	},
+
+	_isVersion07x: function() {
+		var version = L.version.split(".");
+		//If Version is == 0.7.*
+		return parseInt(version[0], 10) === 0 && parseInt(version[1], 10) === 7;
 	}
 
 });
@@ -1440,7 +1495,13 @@ L.Control.Filter = L.Control.extend({
 
 	_clearFilter: function(suppressEvent) {
 		// Remove the filter shape
-		this.options.featureGroup.clearLayers();
+		try {
+			this.options.featureGroup.clearLayers();
+		}
+		catch (err) {
+			// suppress circle remove error
+		}
+
 		this._filterState = undefined;
 
 		// Fire the event
@@ -1503,6 +1564,8 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 	},
 
 	initialize: function (options) {
+		L.FontAwesomeToolbar.prototype.initialize.call(this, options);
+
 		/*
 		 * Override default options based on what is passed in
 		 * Set the options to be the combination of what was passed in and what is default
@@ -1518,7 +1581,6 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 		// Set this.options to be options since we have already extended the options
 		this.options = options;
 		this._toolbarClass = 'leaflet-draw-filter';
-		L.FontAwesomeToolbar.prototype.initialize.call(this, options);
 	},
 
 	getModeHandlers: function (map) {
@@ -1583,6 +1645,7 @@ L.FilterToolbar = L.FontAwesomeToolbar.extend({
 
 	addToolbar: function (map) {
 		var container = L.FontAwesomeToolbar.prototype.addToolbar.call(this, map);
+
 		this.setFiltered(false);
 		return container;
 	},

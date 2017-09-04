@@ -9,12 +9,42 @@ let
 	runSequence = require('run-sequence'),
 
 	plugins = gulpLoadPlugins(),
-	assets = require('./config/assets'),
 	pkg = require('./package.json');
 
 
 // Banner to append to generated files
-let bannerString = '/*! ' + pkg.name + '-' + pkg.version + ' - ' + pkg.copyright + '*/\n'
+let bannerString = `/*! ${pkg.name} - ${pkg.version} - ${pkg.copyright} */\n`;
+
+// Consolidating asset locations
+let assets = {
+	// Build related items
+	build: {
+		js: 'gulpfile.js'
+	},
+
+	// Test files
+	tests: {
+		js: [ 'test/js/**/*.js' ]
+	},
+
+	// Source files and directories
+	src: {
+		entry: 'src/js/index.js',
+		js: 'src/js/**/*.js',
+		sass: [
+			'src/sass/**/*.scss'
+		],
+		fonts: {
+			dir: [ 'src/sass/fonts/*' ],
+			base: 'src/sass'
+		}
+	},
+
+	// Distribution related items
+	dist: {
+		dir: 'dist'
+	}
+};
 
 
 /**
@@ -23,9 +53,9 @@ let bannerString = '/*! ' + pkg.name + '-' + pkg.version + ' - ' + pkg.copyright
 
 gulp.task('validate-js', () => {
 
-	return gulp.src(assets.src.js)
+	return gulp.src([ assets.src.js, assets.build.js ])
 
-	// ESLint
+		// ESLint
 		.pipe(plugins.eslint())
 		.pipe(plugins.eslint.format())
 		.pipe(plugins.eslint.failAfterError());
@@ -37,27 +67,37 @@ gulp.task('validate-js', () => {
  * Build
  */
 
-gulp.task('build-js', ['rollup-js'], () => {
+gulp.task('build-js', [ 'rollup-js' ], () => {
 
 	// Uglify
-	return gulp.src(path.join(assets.dist.dir, (pkg.artifactName + '.js')))
-		.pipe(plugins.uglify({ preserveComments: 'license' }))
-		.pipe(plugins.rename(pkg.artifactName + '.min.js'))
+	return gulp.src(path.join(assets.dist.dir, `${pkg.artifactName}.js`))
+		.pipe(plugins.uglify({ output: { comments: 'license' } }))
+		.on('error', (err) => { plugins.util.log(plugins.util.colors.red('[Uglify]'), err.toString()); })
+		.pipe(plugins.rename(`${pkg.artifactName}.min.js`))
 		.pipe(gulp.dest(assets.dist.dir));
 
 });
 
 gulp.task('rollup-js', () => {
+
 	return rollup.rollup({
-		entry: assets.src.entry
-	})
+			input: assets.src.entry,
+			external: [
+				'leaflet',
+				'leaflet-draw'
+			]
+		})
 		.then((bundle) => {
 			return bundle.write({
-				dest: path.join(assets.dist.dir, (pkg.artifactName + '.js')),
+				file: path.join(assets.dist.dir, `${pkg.artifactName}.js`),
 				format: 'umd',
-				moduleName: 'leafletD3',
-				sourceMap: true,
-				banner: bannerString
+				name: pkg.moduleName,
+				sourcemap: true,
+				banner: bannerString,
+				globals: {
+					'leaflet': 'L',
+					'leaflet-draw': 'L'
+				}
 			});
 		});
 
@@ -77,7 +117,7 @@ gulp.task('build-css', () => {
 		// Lint the Sass
 		.pipe(plugins.sassLint({
 			formatter: 'stylish',
-			rules: require('./config/sasslint.conf.js')
+			rules: require('./sasslint.rules.js')
 		}))
 		.pipe(plugins.sassLint.format())
 		.pipe(plugins.sassLint.failOnError())
@@ -85,15 +125,15 @@ gulp.task('build-css', () => {
 		// Compile and concat the sass (w/sourcemaps)
 		.pipe(plugins.sourcemaps.init())
 		.pipe(plugins.sass())
-		.pipe(plugins.concat(pkg.artifactName + '.css'))
+		.pipe(plugins.concat(`${pkg.artifactName}.css`))
 		.pipe(plugins.insert.prepend(bannerString))
 		.pipe(plugins.sourcemaps.write('.'))
 		.pipe(gulp.dest(assets.dist.dir))
 
 		// Clean the CSS
-		.pipe(plugins.filter(path.join(assets.dist.dir, (pkg.artifactName + '.css'))))
+		.pipe(plugins.filter(path.join(assets.dist.dir, `${pkg.artifactName}.css`)))
 		.pipe(plugins.cleanCss())
-		.pipe(plugins.rename(pkg.artifactName + '.min.css'))
+		.pipe(plugins.rename(`${pkg.artifactName}.min.css`))
 		.pipe(gulp.dest(assets.dist.dir));
 
 });

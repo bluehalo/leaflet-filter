@@ -1,4 +1,4 @@
-/*! @asymmetrik/leaflet-filter-1.0.9 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.*/
+/*! @asymmetrik/leaflet-filter - 1.1.0 - Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved. */
 @font-face {
   font-family: 'filter';
   font-style: normal;
@@ -17,8 +17,7 @@
 .icon-hex::before,
 .icon-square::before {
   display: inline-block;
-  font-family: 'filter';
-  font-smoothing: antialiased;
+  font-family: 'filter', sans-serif;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;
@@ -60,8 +59,7 @@
 .icon-hex::before,
 .icon-square::before {
   display: inline-block;
-  font-family: 'filter';
-  font-smoothing: antialiased;
+  font-family: 'filter', sans-serif;
   font-style: normal;
   font-variant: normal;
   font-weight: normal;

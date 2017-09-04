@@ -1,5 +1,5 @@
 L.FontAwesomeToolbar = L.Class.extend({
-	includes: [ L.Mixin.Events ],
+	includes: L.Mixin.Events,
 
 	initialize: function (options) {
 		L.setOptions(this, options);
@@ -138,23 +138,31 @@ L.FontAwesomeToolbar = L.Class.extend({
 			link.title = options.title;
 		}
 
+		/* iOS does not use click events */
+		var buttonEvent = this._detectIOS() ? 'touchstart' : 'click';
+
 		L.DomEvent
 			.on(link, 'click', L.DomEvent.stopPropagation)
 			.on(link, 'mousedown', L.DomEvent.stopPropagation)
 			.on(link, 'dblclick', L.DomEvent.stopPropagation)
+			.on(link, 'touchstart', L.DomEvent.stopPropagation)
 			.on(link, 'click', L.DomEvent.preventDefault)
-			.on(link, 'click', options.callback, options.context);
+			.on(link, buttonEvent, options.callback, options.context);
 
 		return link;
 	},
 
 	_disposeButton: function (button, callback) {
+		/* iOS does not use click events */
+		var buttonEvent = this._detectIOS() ? 'touchstart' : 'click';
+
 		L.DomEvent
 			.off(button, 'click', L.DomEvent.stopPropagation)
 			.off(button, 'mousedown', L.DomEvent.stopPropagation)
 			.off(button, 'dblclick', L.DomEvent.stopPropagation)
+			.off(button, 'touchstart', L.DomEvent.stopPropagation)
 			.off(button, 'click', L.DomEvent.preventDefault)
-			.off(button, 'click', callback);
+			.off(button, buttonEvent, callback);
 	},
 
 	_handlerActivated: function (e) {
@@ -254,5 +262,11 @@ L.FontAwesomeToolbar = L.Class.extend({
 		L.DomUtil.removeClass(this._toolbarContainer, 'leaflet-draw-toolbar-nobottom');
 		L.DomUtil.removeClass(this._actionsContainer, 'leaflet-draw-actions-top');
 		L.DomUtil.removeClass(this._actionsContainer, 'leaflet-draw-actions-bottom');
+	},
+
+	_detectIOS: function () {
+		var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+		return iOS;
 	}
+
 });
