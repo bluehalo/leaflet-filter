@@ -1,3 +1,5 @@
+import 'leaflet';
+
 L.Filter = (null != L.Filter) ? L.Filter : {};
 
 L.Filter.SimpleShape = L.Filter.Feature.extend({
@@ -20,16 +22,19 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 
 			//TODO refactor: move cursor to styles
 			this._container.style.cursor = 'crosshair';
-			this._tooltip.updateContent({ text: this._initialLabelText });
 
 			this._map
 				.on('mousedown', this._onMouseDown, this)
-				.on('mousemove', this._onMouseMove, this);
+				.on('mousemove', this._onMouseMove, this)
+				.on('touchstart', this._onMouseDown, this)
+				.on('touchmove', this._onMouseMove, this);
 		}
 	},
 
 	removeHooks: function () {
 		L.Filter.Feature.prototype.removeHooks.call(this);
+		this._isDrawing = false;
+
 		if (this._map) {
 			if (this._mapDraggable) {
 				this._map.dragging.enable();
@@ -40,17 +45,26 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 
 			this._map
 				.off('mousedown', this._onMouseDown, this)
-				.off('mousemove', this._onMouseMove, this);
+				.off('mousemove', this._onMouseMove, this)
+				.off('touchstart', this._onMouseDown, this)
+				.off('touchmove', this._onMouseMove, this);
 
 			L.DomEvent.off(document, 'mouseup', this._onMouseUp, this);
+			L.DomEvent.off(document, 'touchend', this._onMouseUp, this);
 
 			// If the box element doesn't exist they must not have moved the mouse, so don't need to destroy/return
 			if (this._shape) {
-				this._map.removeLayer(this._shape);
+				try {
+					this._map.removeLayer(this._shape);
+				}
+				catch (err) {
+					// Suppress the error on removing circle
+				}
+
 				delete this._shape;
 			}
 		}
-		this._isDrawing = false;
+
 	},
 
 	_getTooltipText: function () {
@@ -65,6 +79,7 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 
 		L.DomEvent
 			.on(document, 'mouseup', this._onMouseUp, this)
+			.on(document, 'touchend', this._onMouseUp, this)
 			.preventDefault(e.originalEvent);
 	},
 
@@ -75,6 +90,9 @@ L.Filter.SimpleShape = L.Filter.Feature.extend({
 		if (this._isDrawing) {
 			this._drawShape(latlng);
 			this._tooltip.updateContent(this._getTooltipText());
+		}
+		else {
+			this._tooltip.updateContent({ text: this._initialLabelText });
 		}
 	},
 

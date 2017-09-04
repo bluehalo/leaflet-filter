@@ -1,3 +1,5 @@
+import 'leaflet';
+
 L.Filter = (null != L.Filter) ? L.Filter : {};
 
 L.Filter.Polygon = L.Filter.Polyline.extend({

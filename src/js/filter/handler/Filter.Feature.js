@@ -1,3 +1,5 @@
+import 'leaflet';
+
 L.Filter = (null != L.Filter) ? L.Filter : {};
 
 L.Filter.Feature = L.Handler.extend({
@@ -17,8 +19,12 @@ L.Filter.Feature = L.Handler.extend({
 	},
 
 	enable: function (suppressEvents) {
-		if (this._enabled || this.isLocked()) { return; }
+		if (this._enabled || this.isLocked()) {
+			return;
+		}
+
 		L.Handler.prototype.enable.call(this);
+
 		this.fire('enabled', {handler: this.type});
 
 		if(!suppressEvents) {
@@ -27,7 +33,10 @@ L.Filter.Feature = L.Handler.extend({
 	},
 
 	disable: function (suppressEvents) {
-		if (!this._enabled) { return; }
+		if (!this._enabled) {
+			return;
+		}
+
 		L.Handler.prototype.disable.call(this);
 
 		if(!suppressEvents) {
