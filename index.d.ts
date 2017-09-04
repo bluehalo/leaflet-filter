@@ -1,7 +1,7 @@
-/// <reference types="leaflet" />
-/// <reference types="leaflet-draw" />
+import * as L from 'leaflet';
+import 'leaflet-draw';
 
-declare namespace L {
+declare module 'leaflet' {
 
 	namespace Control {
 
