@@ -5,10 +5,11 @@
 	font-style: normal;
 	font-weight: normal;
 
-	src: url('./fonts/filter_de356ac816c37844619223686e4eb1f2.eot?#iefix') format('embedded-opentype'),
-	     url('./fonts/filter_de356ac816c37844619223686e4eb1f2.woff') format('woff'),
-	     url('./fonts/filter_de356ac816c37844619223686e4eb1f2.ttf') format('truetype'),
-	     url('./fonts/filter_de356ac816c37844619223686e4eb1f2.svg#filter') format('svg');
+	src:
+		url('./fonts/filter_de356ac816c37844619223686e4eb1f2.eot?#iefix') format('embedded-opentype'),
+		url('./fonts/filter_de356ac816c37844619223686e4eb1f2.woff') format('woff'),
+		url('./fonts/filter_de356ac816c37844619223686e4eb1f2.ttf') format('truetype'),
+		url('./fonts/filter_de356ac816c37844619223686e4eb1f2.svg#filter') format('svg');
 }
 
 @media screen {

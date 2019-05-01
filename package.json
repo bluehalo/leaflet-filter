@@ -3,49 +3,49 @@
 	"artifactName": "leaflet-filter",
 	"moduleName": "leafletFilter",
 	"description": "Extension of Leaflet.Draw that limits you to only drawing a single shape",
-	"version": "1.1.1",
+	"version": "1.4.0",
 	"author": "Asymmetrik, Ltd.",
-	"copyright": "Copyright Asymmetrik, Ltd. 2007-2017 - All Rights Reserved.",
+	"copyright": "Copyright Asymmetrik, Ltd. 2007-2019 - All Rights Reserved.",
 	"license": "MIT",
-
+	"scripts": {
+		"build": "npm run bundle",
+		"prebuild": "npm run lint",
+		"bundle": "npm run bundle:styles && npm run bundle:code",
+		"bundle:code": "npm run build:rollup && npm run build:uglify",
+		"bundle:styles": "npm run build:node-sass",
+		"lint": "npm run lint:eslint && npm run lint:stylelint",
+		"lint:eslint": "eslint 'src/**/*.js'",
+		"lint:stylelint": "stylelint './src/**/*.scss'",
+		"build:node-sass": "node-sass --source-map true --output-style compressed src/index.scss dist/leaflet-filter.css",
+		"build:rollup": "rollup -c rollup.config.js",
+		"build:uglify": "uglifyjs --comments 'license' -o ./dist/leaflet-filter.min.js -- ./dist/leaflet-filter.js",
+		"watch": " watch 'npm run build' ./src"
+	},
 	"main": "dist/leaflet-filter.js",
 	"module": "index.js",
 	"typings": "index.d.ts",
-
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Asymmetrik/leaflet-filter.git"
 	},
-
 	"peerDependencies": {
 		"leaflet": "1",
-		"leaflet-draw": "0.4",
+		"leaflet-draw": "1",
 		"font-awesome": "4"
 	},
-
 	"devDependencies": {
-		"leaflet": "1.2",
-		"@types/leaflet": "1.2",
-		"leaflet-draw": "0.4",
+		"@types/leaflet": "1.4",
 		"@types/leaflet-draw": "0.4",
-
+		"eslint": "5",
 		"font-awesome": "4",
-
-		"rollup": "0.49",
-
-		"gulp": "3.9",
-		"gulp-clean-css": "3.7",
-		"gulp-concat": "2.6",
-		"gulp-eslint": "4.0",
-		"gulp-filter": "5.0",
-		"gulp-insert": "0.5",
-		"gulp-load-plugins": "1.5",
-		"gulp-rename": "1.2",
-		"gulp-sass": "2.3",
-		"gulp-sass-lint": "1.3",
-		"gulp-sourcemaps": "2.6",
-		"gulp-uglify": "3.0",
-		"run-sequence": "2.1",
-		"node-sass": "3.13"
+		"leaflet": "1.4",
+		"leaflet-draw": "1",
+		"node-sass": "4",
+		"rollup": "1",
+		"stylelint": "9",
+		"stylelint-config-recommended-scss": "3",
+		"stylelint-scss": "3",
+		"uglify-js": "3",
+		"watch": "1"
 	}
 }
